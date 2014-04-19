@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="DefaultLocale" severity="ignore">
+        <ignore path="src\com\birdy\smbwrapper\PlayerView.java" />
+        <ignore path="src\com\birdy\smbwrapper\StreamOverHttp.java" />
+        <ignore path="src\jcifs\Config.java" />
+    </issue>
+</lint>

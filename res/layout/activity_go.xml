@@ -1,0 +1,266 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:screenOrientation="landscape"
+    android:clickable="false"
+    tools:context=".Go" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="14dp"
+        android:text="SmbWrapper By Guth Stéphane for XBMC" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView1"
+        android:layout_alignLeft="@+id/textView1"
+        android:text="XBMC Wrapper by Xmister, based on" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="14dp"
+        android:clickable="false"
+        android:text="Install playercorefactory.xml" />
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_alignRight="@+id/TextView03"
+        android:text="Players"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/samba"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/TextView03"
+        android:layout_alignBottom="@+id/TextView03"
+        android:layout_alignLeft="@+id/http"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="com.mxtech.videoplayer.ad"
+        android:width="300dp" />
+
+    <TextView
+        android:id="@+id/TextView05"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:text="Samba Replace"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/rfrom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView05"
+        android:layout_below="@+id/TextView05"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="(?i)smb://10.0.1.4/2tb"
+        android:width="225dp" />
+
+    <EditText
+        android:id="@+id/rto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/rfrom"
+        android:layout_alignBottom="@+id/rfrom"
+        android:layout_marginLeft="12dp"
+        android:layout_toRightOf="@+id/rfrom"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="file:///mnt/sata"
+        android:width="225dp" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/TextView01"
+        android:layout_marginRight="27dp"
+        android:layout_toLeftOf="@+id/button1"
+        android:text="playercorefactory.xml not found !"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/rfrom2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rfrom"
+        android:layout_marginTop="12dp"
+        android:layout_toLeftOf="@+id/rto"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="(?i)smb://cubie/2tb"
+        android:width="225dp" />
+
+    <EditText
+        android:id="@+id/rto2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/rfrom2"
+        android:layout_alignBottom="@+id/rfrom2"
+        android:layout_alignLeft="@+id/rto"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="file:///mnt/sata"
+        android:width="225dp" />
+
+    <EditText
+        android:id="@+id/file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/TextView06"
+        android:layout_alignBottom="@+id/TextView06"
+        android:layout_alignLeft="@+id/samba"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="com.mxtech.videoplayer.ad"
+        android:width="300dp" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/http"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/TextView04"
+        android:layout_alignBottom="@+id/TextView04"
+        android:layout_alignLeft="@+id/pvr"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="com.softwinner.TvdVideo"
+        android:width="300dp" />
+
+    <EditText
+        android:id="@+id/pvr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/pvrText"
+        android:layout_alignBottom="@+id/pvrText"
+        android:layout_marginLeft="31dp"
+        android:layout_toRightOf="@+id/pvrText"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="com.softwinner.TvdVideo"
+        android:width="300dp" />
+
+    <TextView
+        android:id="@+id/pvrText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/TextView04"
+        android:layout_below="@+id/http"
+        android:layout_marginTop="15dp"
+        android:text="PVR"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/TextView04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/TextView03"
+        android:layout_below="@+id/samba"
+        android:layout_marginTop="11dp"
+        android:text="HTTP"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/TextView06"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TextView02"
+        android:layout_marginTop="19dp"
+        android:layout_toLeftOf="@+id/pvr"
+        android:text="File"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/TextView03"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView05"
+        android:layout_below="@+id/file"
+        android:layout_marginTop="10dp"
+        android:text="Samba"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <CheckBox
+        android:id="@+id/r1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rfrom2"
+        android:layout_marginLeft="21dp"
+        android:layout_toRightOf="@+id/rto"
+        android:text="Enable" />
+
+    <CheckBox
+        android:id="@+id/r2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rto2"
+        android:layout_alignLeft="@+id/r1"
+        android:text="Enable" />
+
+    <TextView
+        android:id="@+id/TextView07"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rfrom2"
+        android:layout_below="@+id/rfrom2"
+        android:layout_marginTop="17dp"
+        android:text="PVR Mapping"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/pvrmap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/TextView07"
+        android:layout_alignBottom="@+id/TextView07"
+        android:layout_alignRight="@+id/button1"
+        android:layout_toRightOf="@+id/TextView05"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="9,3;10,2;3,4;4,7;5,9;6,11;1,12;2,14;7,13;8,1"
+        android:width="225dp" />
+
+    <TextView
+        android:id="@+id/TextView08"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/TextView06"
+        android:layout_marginLeft="46dp"
+        android:layout_toRightOf="@+id/file"
+        android:text="TVHeadend Host"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/tvh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="27dp"
+        android:layout_toRightOf="@+id/TextView08"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="localhost"
+        android:width="225dp" />
+
+</RelativeLayout>

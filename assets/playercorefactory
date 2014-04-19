@@ -1,0 +1,30 @@
+
+<playercorefactory>
+	<players>
+		<player name="XBMCWrapper" type="ExternalPlayer" audio="false" video="true">
+			<filename>hu.xmister.xbmcwrapper</filename>
+			<hidexbmc>true</hidexbmc>
+			<playcountminimumtime>120</playcountminimumtime>
+		</player>
+	</players>
+
+	<rules action="prepend">
+		<rule protocols="smb" name="XBMCWrapper" />
+
+		<rule dvdimage="true" player="XBMCWrapper"/>
+		
+		<rule protocols="rtmp" player="XBMCWrapper"/>
+		
+		<rule protocols="rtsp" player="XBMCWrapper" />
+		
+        <rule protocols="sop" player="XBMCWrapper" />
+        
+        <rule protocols="pvr" player="XBMCWrapper" />
+        
+		
+		<!-- Internet streams -- Disabled for now -->
+		<!--<rule internetstream="true" player="MXPlayerFree" />-->
+
+		<rule video="true" player="XBMCWrapper"/>
+	</rules>
+</playercorefactory>
