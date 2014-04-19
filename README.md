@@ -14,7 +14,7 @@ Features:
 A little explanations:
 
  - Re-stream HTTP specially for Allwinner A10 devices HW decoder.
- - - I've made this for TvHeadend, as normally it would play in SW decoding mode which is unenjoyable. Now it uses HW decoder, if you use this wrapper.
+    I've made this for TvHeadend, as normally it would play in SW decoding mode which is unenjoyable. Now it uses HW decoder, if you use this wrapper.
 
  - Map XBMC PVR to TvHeadend Channels. (*/* login for streaming required)
  - - XBMC uses its own id's for TV channels(the number before their name), you can set how to remap these to tvheadend channel id's to play in external player.
