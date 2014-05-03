@@ -1,29 +1,18 @@
 package hu.xmister.xbmcwrapper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.ViewDebug.FlagToString;
 
 public class PlayerView extends Activity {
 	private String FileSmb="";
@@ -186,7 +175,7 @@ public class PlayerView extends Activity {
 				while (Serv.getPort() == 0) Thread.sleep(2000);
 			} catch (Exception e) {}
 			LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
-			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+FileSmb.substring(6)), "video/*");
+			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6), "UTF-8")), "video/*");
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {
