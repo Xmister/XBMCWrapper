@@ -172,7 +172,7 @@ public class PlayerView extends Activity {
 			}
 			
 			try {
-				while (Serv.getPort() == 0) Thread.sleep(2000);
+				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
 			LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6), "UTF-8")), "video/*");
@@ -184,7 +184,7 @@ public class PlayerView extends Activity {
 			}
 			
 			try {
-				while (Serv.getPort() == 0) Thread.sleep(2000);
+				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
 			LaunchIntent.setPackage(sharedPreferences.getString(protocol, "com.softwinner.TvdVideo"));
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/video"+System.currentTimeMillis()+".mpeg"), "video/*");
