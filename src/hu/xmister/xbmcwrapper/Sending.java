@@ -156,11 +156,14 @@ public class Sending extends Thread {
             	sendCount=-1;
             }
          }
-         buf = new byte[1000000];
-         if (_Del.getProtocol().equals("smb"))
+         buf = new byte[100*1024];
+         if (_Del.getProtocol().equals("smb")) {
         	 sendResponse(_Socket, status, _fileMimeType, headers, _SmbStream, sendCount, buf, null);
-         else if (_Del.getProtocol().equals("http"))
+         }
+         else if (_Del.getProtocol().equals("http")) {
+        	 //buf = new byte[1000000];
         	 sendResponse(_Socket, status, _fileMimeType, headers, _Stream, sendCount, buf, null);
+         }
          
          Log.d("Http","Http stream finished");
       }catch(Exception ioe){
@@ -259,8 +262,9 @@ private void sendError(Socket socket, String status, String msg) throws Interrup
 private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf, long maxSize) {
 	  Log.d("copyStream","Max Size:"+maxSize);
 	  if (maxSize < 0) maxSize=999999999;
+	  int count;
   while(maxSize>0 && (!_Del.Stoping)){
-     int count = (int)Math.min(maxSize, tmpBuf.length);
+     count = (int)Math.min(maxSize, tmpBuf.length);
      try {
      	//Log.d("copyStream","Read");
 			count = in.read(tmpBuf, 0, count);
@@ -282,7 +286,6 @@ private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf,
      
      maxSize -= count;
      //Log.d("copyStream"," Count:"+count+" Maxsize:"+maxSize);
-     
   } 
 }
 /**
