@@ -11,13 +11,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 
 public class PlayerView extends Activity {
 	private String FileSmb="";
 	private StreamOverHttp Serv=null;
+	private final String BB_BINARY="busybox"; //Actual path may vary, but it's usually in PATH, so just use the command.
+	private final String SD_PATH="/mnt/sdcard";
 	
 	@Override
 	protected void onRestart() {
@@ -62,8 +63,6 @@ public class PlayerView extends Activity {
 			FileSmb = extras.toString();
 		}
 		if (FileSmb.startsWith("smb://")) {
-			
-			// Demarre rockplayer
 			Log.d("smbwrapper","Launch SMB: "+FileSmb);
 			if (sharedPreferences.getBoolean("r1", false))
 				FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
@@ -79,23 +78,7 @@ public class PlayerView extends Activity {
 			else {
 				try {
 					//Try to mount it using cifs for best performance
-					//busybox mount -t cifs -o username=guest,user,rw,iocharset=utf8
-					// Preform su to get root privledges  
-					File directory = new File(Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper");
-					directory.mkdirs();
-					FileSmb = FileSmb.replaceFirst("(?i)smb:", "");
-					String smbfile=FileSmb;
-					smbfile=smbfile.substring(2);
-					smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-					smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-					String cmd="/system/bin/busybox mount -t cifs -o username=guest,user,rw,iocharset=utf8 "+FileSmb.substring(0, FileSmb.indexOf(smbfile)-1)+" "+Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+"\n";
-					Log.d("Mounting CIFS", cmd);
-					if (executeSu(cmd) != 0) throw new Exception();
-					LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					Log.d("smbwrapper","Launch Player: "+FileSmb);
-					LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
-					LaunchIntent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath()+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
-					startActivityForResult(LaunchIntent,1);
+					cifsMountPlay(FileSmb);
 				} catch (Exception e) {
 					// Failed, fall back to HTTP Stream
 					startHTTPStreaming("smb", FileSmb);
@@ -103,13 +86,7 @@ public class PlayerView extends Activity {
 			}
 		}
 		else if (FileSmb.startsWith("http://")) {
-			
-			// Demarre le servceur
 			Log.d("smbwrapper","Launch HTTP: "+FileSmb);
-			/*Intent LaunchIntent = new Intent(this,Streaming.class);
-			LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
-			startActivity(LaunchIntent);*/
-			//startDLNAPlayer(FileSmb);
 			startHTTPStreaming("http",FileSmb);
 		}
 		else if (FileSmb.startsWith("pvr://")) {
@@ -137,41 +114,7 @@ public class PlayerView extends Activity {
 					}
 				}
 			}
-			/*switch (Integer.valueOf(id)+1) {
-			case 9: 				//XBMC ID
-				id="3";				//Real ID
-				break;
-			case 10:
-				id="2";
-				break;
-			case 3:
-				id="4";
-				break;
-			case 4:
-				id="7";
-				break;
-			case 5:
-				id="9";
-				break;
-			case 6:
-				id="11";
-				break;
-			case 1:
-				id="12";
-				break;
-			case 2:
-				id="14";
-				break;
-			case 7:
-				id="13";
-				break;
-			case 8:
-				id="1";
-				break;
-				//
-			}*/
 			String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
-			//startDLNAPlayer(url);
 			startHTTPStreaming("pvr",url);
 			
 		}
@@ -197,6 +140,30 @@ public class PlayerView extends Activity {
 			finish();
 			return;
 		}
+	}
+	
+	private void cifsMountPlay(final String FileSmb) throws Exception {
+		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+		// Perform su to get root privileges
+		File directory = new File(SD_PATH+File.separator+"xbmcwrapper");
+		directory.mkdirs();
+		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbfile=smbpath.substring(2);
+		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		String cmd=BB_BINARY+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		Log.d("Mounting CIFS", cmd);
+		if (executeSu(cmd) != 0) {
+			//Some device doesn't support UTF8
+			cmd=BB_BINARY+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+			Log.d("Mounting CIFS", cmd);
+			if (executeSu(cmd) != 0) throw new Exception(); //Give up
+		}
+		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+		Log.d("smbwrapper","Launch Player: "+SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile);
+		LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
+		LaunchIntent.setDataAndType(Uri.fromFile(new File(SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
+		startActivityForResult(LaunchIntent,1);
 	}
 	
 	private void startHTTPStreaming(final String protocol, final String FileSmb) {
@@ -251,7 +218,7 @@ public class PlayerView extends Activity {
 		//The file handlers may not be free right away
 		for (int i=1; i<=10; i++) {
 			try {
-				String cmd="/system/bin/busybox umount "+Environment.getExternalStorageDirectory().getPath()+File.separator+"xbmcwrapper"+"\n";
+				String cmd=BB_BINARY+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 				Log.d("UnMounting CIFS", cmd);
 				int r=executeSu(cmd);
 				Log.d("UnMount Result", ""+r);
@@ -259,7 +226,7 @@ public class PlayerView extends Activity {
 				else throw new Exception();
 			} catch (Exception e) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 				} catch (Exception ie) {}
 			}
 		}
