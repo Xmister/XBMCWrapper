@@ -8,8 +8,8 @@ import java.io.OutputStream;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -18,6 +18,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -51,13 +52,14 @@ public class Go extends Activity implements OnClickListener {
 		MonBt=(Button) findViewById(R.id.button1);
 		MonBt.setOnClickListener(this);
 		
-		File PlayerC=new File("/mnt/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
+		
+		File PlayerC=new File(Environment.getExternalStorageDirectory().getPath()+"/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
 		if (PlayerC.exists())
 			Montext.setText("playercorefactory.xml already exist");	
 		else
 			Montext.setText("playercorefactory.xml not found");
 		
-		File XbmcC=new File("/mnt/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata");
+		File XbmcC=new File(Environment.getExternalStorageDirectory().getPath()+"/Android/data/org.xbmc.xbmc/files/.xbmc/userdata");
 		if (!XbmcC.isDirectory()) {
 			Montext.setText("XBMC not found !!");
 			MonBt.setClickable(false);
@@ -73,6 +75,18 @@ public class Go extends Activity implements OnClickListener {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_go, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.menu_save:
+	            save();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	@Override
@@ -92,7 +106,7 @@ public class Go extends Activity implements OnClickListener {
 			
 		OutputStream os;
 		try {
-			os = new FileOutputStream("/mnt/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
+			os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath()+"/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
 		byte[] buffer = new byte[4096];
 		int length;
 		while ((length = is.read(buffer)) > 0) {
@@ -108,9 +122,7 @@ public class Go extends Activity implements OnClickListener {
 		Montext.setText("Install ok :-)");
 	}
 	
-	@Override
-	protected void onStop() {
-		super.onStop();
+	private void save() {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		Editor editor = sharedPreferences.edit();
 		editor.putString("samba", ((EditText)findViewById(R.id.samba)).getText().toString());
@@ -126,7 +138,12 @@ public class Go extends Activity implements OnClickListener {
 		editor.putBoolean("r1", ((CheckBox)findViewById(R.id.r1)).isChecked());
 		editor.putBoolean("r2", ((CheckBox)findViewById(R.id.r2)).isChecked());
 		editor.commit();
-		
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		save();
 	}
 	
 	@Override

@@ -94,7 +94,7 @@ public class PlayerView extends Activity {
 					LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					Log.d("smbwrapper","Launch Player: "+FileSmb);
 					LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
-					LaunchIntent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
+					LaunchIntent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath()+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
 					startActivityForResult(LaunchIntent,1);
 				} catch (Exception e) {
 					// Failed, fall back to HTTP Stream
@@ -232,57 +232,7 @@ public class PlayerView extends Activity {
 		
 	}
 	
-	private void startDLNAPlayer(final String FileSmb) {
-		final String mime="video/mp2t";
-		/*try {
-			URL address = new URL(FileSmb);
-			HttpURLConnection connection = (HttpURLConnection)address.openConnection();
-			mime=connection.getContentType();
-			connection.disconnect();
-		} catch (Exception e) {}*/
-		try {
-			 // Preform su to get root privledges  
-			   Process p = Runtime.getRuntime().exec("su");   
-			     
-			   // Attempt to write a file to a root-only   
-			   DataOutputStream os = new DataOutputStream(p.getOutputStream()); 
-			   os.writeBytes("/system/bin/busybox killall com.bubblesoft.android.bubbleupnp\n");
-			   os.flush();
-			   os.writeBytes("exit\n");
-			   os.flush();
-			   p.waitFor();
-			   Log.d("Kill",""+p.exitValue());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			Log.e("Kill", e.getMessage());
-		}
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-		}
-			new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					LaunchIntent.setPackage("com.bubblesoft.android.bubbleupnp");
-					Log.d("smbwrapper","Launch Player: "+FileSmb);
-					LaunchIntent.setFlags(0x30);
-					LaunchIntent.setDataAndType(Uri.parse(FileSmb), mime);
-					startActivityForResult(LaunchIntent,1);
-				}
-			}).start();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-			}
-		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		LaunchIntent.setPackage("com.bubblesoft.android.bubbleupnp");
-		Log.d("smbwrapper","Launch Player: "+FileSmb);
-		LaunchIntent.setFlags(0x30);
-		LaunchIntent.setDataAndType(Uri.parse(FileSmb), mime);
-		startActivityForResult(LaunchIntent,1);
-	}
+	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -301,7 +251,7 @@ public class PlayerView extends Activity {
 		//The file handlers may not be free right away
 		for (int i=1; i<=10; i++) {
 			try {
-				String cmd="/system/bin/busybox umount "+Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+"\n";
+				String cmd="/system/bin/busybox umount "+Environment.getExternalStorageDirectory().getPath()+File.separator+"xbmcwrapper"+"\n";
 				Log.d("UnMounting CIFS", cmd);
 				int r=executeSu(cmd);
 				Log.d("UnMount Result", ""+r);

@@ -3,15 +3,12 @@ package hu.xmister.xbmcwrapper;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -222,8 +219,8 @@ public class Sending extends Thread {
              }
 	         _SmbStream = new SmbFileInputStream(MonFichier);
 	         _FileSize= MonFichier.length();
-	         //_fileMimeType="video/x-"+getExtension(URI);
-	         _fileMimeType=MonFichier.getContentType();
+	         _fileMimeType="video/x-"+getExtension(URI);
+	         //_fileMimeType=MonFichier.getContentType();
          } else {
         	 URL address = new URL(_Del.getUrl()); 
         	 HttpURLConnection connection = (HttpURLConnection)address.openConnection();
