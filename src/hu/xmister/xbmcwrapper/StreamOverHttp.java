@@ -35,6 +35,12 @@ public class StreamOverHttp extends Thread {
    public StreamOverHttp(String protocol, String url) {
 	   this.protocol=protocol;
 	   this.url=url;
+	   port=37689;
+	   try {
+		   serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
+	   } catch (Exception e) {
+		   port=0;
+	   }
    }
    
    @Override
@@ -44,7 +50,7 @@ public class StreamOverHttp extends Thread {
 	try {
 		serverSocket = new ServerSocket();
 		serverSocket.setSoTimeout(500);
-		while (true) {
+		while (port == 0) {
 			try {
 				Random r = new Random(System.currentTimeMillis());
 				port=r.nextInt(32000);
@@ -52,6 +58,7 @@ public class StreamOverHttp extends Thread {
 				serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
 				break;
 			} catch (Exception e) {
+				port=0;
 				//TODO
 			}
 		}

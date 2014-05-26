@@ -35,8 +35,8 @@ public class Sending extends Thread {
 	      HTTP_BADREQUEST = "400 Bad Request",
 	      HTTP_416 = "416 Range not satisfiable",
 	      HTTP_INTERNALERROR = "500 Internal Server Error",
-	   	  HTTP_404 = "HTTP/1.0 404 Not Found",
-	   	  HTTP_401 = "HTTP/1.0 401 Not Allowed";
+	   	  HTTP_404 = "404 Not Found",
+	   	  HTTP_401 = "401 Not Allowed";
 	   
 	   private Socket _Socket;
 	   
@@ -64,7 +64,7 @@ public class Sending extends Thread {
          	return;
          }
          
-         byte[] buf = new byte[32000];
+         byte[] buf = new byte[320];
          int rlen = inS.read(buf, 0, buf.length);
          if(rlen <= 0) {
          	Log.d("handleResponse","Null Size");
@@ -148,7 +148,7 @@ public class Sending extends Thread {
 	            		_SmbStream.skip(startFrom);
 	
 	            headers.put("Content-Length", "" + sendCount);
-	            String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + _FileSize;
+	            String rangeSpec = "bytes " + startFrom + "-" + endAt + "/*";
 	            headers.put("Content-Range", rangeSpec);
             }
             else {
@@ -222,7 +222,8 @@ public class Sending extends Thread {
              }
 	         _SmbStream = new SmbFileInputStream(MonFichier);
 	         _FileSize= MonFichier.length();
-	         _fileMimeType="Video/x-"+getExtension(URI);
+	         //_fileMimeType="video/x-"+getExtension(URI);
+	         _fileMimeType=MonFichier.getContentType();
          } else {
         	 URL address = new URL(_Del.getUrl()); 
         	 HttpURLConnection connection = (HttpURLConnection)address.openConnection();
@@ -299,14 +300,16 @@ private void sendResponse(Socket socket, String status, String mimeType, Propert
       PrintWriter pw = new PrintWriter(out);
 
       {
-         String retLine = "HTTP/1.0 " + status + " \r\n";
+         String retLine = "HTTP/1.1 " + status + " \r\n";
          Log.d("sendResponse", retLine);
          pw.print(retLine);
+         out.flush();
       }
       if(mimeType!=null) {
          String mT = "Content-Type: " + mimeType + "\r\n";
          Log.d("sendResponse", mT);
          pw.print(mT);
+         out.flush();
       }
       if(header != null){
          Enumeration<?> e = header.keys();
@@ -314,7 +317,9 @@ private void sendResponse(Socket socket, String status, String mimeType, Propert
             String key = (String)e.nextElement();
             String value = header.getProperty(key);
             String l = key + ": " + value + "\r\n";
+            Log.d("sendResponse", l);
             pw.print(l);
+            out.flush();
          }
       }
       pw.print("\r\n");

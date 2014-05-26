@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 
@@ -30,6 +31,22 @@ public class PlayerView extends Activity {
 		// TODO Auto-generated method stub
 		super.onRestoreInstanceState(savedInstanceState);
 		System.exit(0);
+	}
+	
+	private int executeSu(String cmd) {
+		try {
+			Process p = Runtime.getRuntime().exec("su");   
+			DataOutputStream os = new DataOutputStream(p.getOutputStream()); 
+			os.writeBytes(cmd);
+			os.flush();
+			os.writeBytes("exit\n");
+			os.flush();
+			p.waitFor();
+			return p.exitValue();
+		}
+		catch (Exception e) {
+			return -1;
+		}
 	}
 	
 	@Override
@@ -60,7 +77,29 @@ public class PlayerView extends Activity {
 				startActivityForResult(LaunchIntent,1);
 			}
 			else {
-				startHTTPStreaming("smb", FileSmb);
+				try {
+					//Try to mount it using cifs for best performance
+					//busybox mount -t cifs -o username=guest,user,rw,iocharset=utf8
+					// Preform su to get root privledges  
+					File directory = new File(Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper");
+					directory.mkdirs();
+					FileSmb = FileSmb.replaceFirst("(?i)smb:", "");
+					String smbfile=FileSmb;
+					smbfile=smbfile.substring(2);
+					smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+					smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+					String cmd="/system/bin/busybox mount -t cifs -o username=guest,user,rw,iocharset=utf8 "+FileSmb.substring(0, FileSmb.indexOf(smbfile)-1)+" "+Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+"\n";
+					Log.d("Mounting CIFS", cmd);
+					if (executeSu(cmd) != 0) throw new Exception();
+					LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					Log.d("smbwrapper","Launch Player: "+FileSmb);
+					LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
+					LaunchIntent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
+					startActivityForResult(LaunchIntent,1);
+				} catch (Exception e) {
+					// Failed, fall back to HTTP Stream
+					startHTTPStreaming("smb", FileSmb);
+				}
 			}
 		}
 		else if (FileSmb.startsWith("http://")) {
@@ -247,20 +286,33 @@ public class PlayerView extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (Serv != null)
-				Serv.Stop();
-		Serv=null;
-		finish();
-		System.exit(0);
+		cleanup();
 	}
 	
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
-		super.onBackPressed();
+		cleanup();
+	}
+	
+	private void cleanup() {
 		if (Serv != null)
 			Serv.Stop();
 		Serv=null;
+		//The file handlers may not be free right away
+		for (int i=1; i<=10; i++) {
+			try {
+				String cmd="/system/bin/busybox umount "+Environment.getExternalStorageDirectory()+File.separator+"xbmcwrapper"+"\n";
+				Log.d("UnMounting CIFS", cmd);
+				int r=executeSu(cmd);
+				Log.d("UnMount Result", ""+r);
+				if ( r == 0 ) break;
+				else throw new Exception();
+			} catch (Exception e) {
+				try {
+					Thread.sleep(1000);
+				} catch (Exception ie) {}
+			}
+		}
 		finish();
 		System.exit(0);
 	}
