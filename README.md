@@ -5,7 +5,7 @@ Thread: http://forum.xbmc.org/showthread.php?tid=192651
 
 Features:
 
- - Stream Samba shares over CIFS or HTTP
+ - Stream Samba shares over CIFS (su, busybox, kernel with cifs support needed) or HTTP
  - Re-stream HTTP specially for Allwinner A10 devices HW decoder.
  - Map XBMC PVR to TvHeadend Channels. (\*/\* login for streaming required)
  - Replace URL On-the-fly
