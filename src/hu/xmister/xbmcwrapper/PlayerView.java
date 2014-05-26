@@ -147,11 +147,13 @@ public class PlayerView extends Activity {
 		// Perform su to get root privileges
 		File directory = new File(SD_PATH+File.separator+"xbmcwrapper");
 		directory.mkdirs();
+		String cmd=BB_BINARY+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		executeSu(cmd); //Just to make sure there is no stuck mount.
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-		String cmd=BB_BINARY+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		cmd=BB_BINARY+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 		Log.d("Mounting CIFS", cmd);
 		if (executeSu(cmd) != 0) {
 			//Some device doesn't support UTF8
