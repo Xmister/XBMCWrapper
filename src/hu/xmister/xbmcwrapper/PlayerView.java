@@ -17,7 +17,8 @@ import android.util.Log;
 public class PlayerView extends Activity {
 	private String FileSmb="";
 	private StreamOverHttp Serv=null;
-	private final String BB_BINARY="busybox"; //Actual path may vary, but it's usually in PATH, so just use the command.
+	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox"};
+	private int BB_BINARY=0;
 	private final String SD_PATH="/mnt/sdcard";
 	
 	@Override
@@ -50,15 +51,22 @@ public class PlayerView extends Activity {
 		}
 	}
 	
+	private void findBB() {
+		for (BB_BINARY=0; BB_BINARY<BB_BINARIES.length; BB_BINARY++) {
+			if ( new File(BB_BINARIES[BB_BINARY]).exists() ) break;
+		}
+		BB_BINARY=Math.min(BB_BINARY, BB_BINARIES.length-1);
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
-		
 		Uri extras = getIntent().getData();
 		Log.d("smbwrapper","Launch");
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+		findBB();
 		if (extras != null) {
 			FileSmb = extras.toString();
 		}
@@ -147,17 +155,17 @@ public class PlayerView extends Activity {
 		// Perform su to get root privileges
 		File directory = new File(SD_PATH+File.separator+"xbmcwrapper");
 		directory.mkdirs();
-		String cmd=BB_BINARY+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 		executeSu(cmd); //Just to make sure there is no stuck mount.
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-		cmd=BB_BINARY+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 		Log.d("Mounting CIFS", cmd);
 		if (executeSu(cmd) != 0) {
 			//Some device doesn't support UTF8
-			cmd=BB_BINARY+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 			Log.d("Mounting CIFS", cmd);
 			if (executeSu(cmd) != 0) throw new Exception(); //Give up
 		}
@@ -220,7 +228,7 @@ public class PlayerView extends Activity {
 		//The file handlers may not be free right away
 		for (int i=1; i<=10; i++) {
 			try {
-				String cmd=BB_BINARY+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+				String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 				Log.d("UnMounting CIFS", cmd);
 				int r=executeSu(cmd);
 				Log.d("UnMount Result", ""+r);
