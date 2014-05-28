@@ -26,21 +26,7 @@ public class PlayerView extends Activity {
 	private StreamOverHttp Serv=null;
 	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox"};
 	private int BB_BINARY=0;
-	private final String SD_PATH="/mnt/sdcard";
-	
-	@Override
-	protected void onRestart() {
-		// TODO Auto-generated method stub
-		super.onRestart();
-		System.exit(0);
-	}
-	
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onRestoreInstanceState(savedInstanceState);
-		System.exit(0);
-	}
+	private String SD_PATH=null;
 	
 	private int executeSu(String cmd) {
 		try {
@@ -65,7 +51,7 @@ public class PlayerView extends Activity {
 		BB_BINARY=Math.min(BB_BINARY, BB_BINARIES.length-1);
 	}
 	
-	private void setStatus(final String msg) {
+	private void setStatus(final String msg, long sleep) {
 		runOnUiThread(new Runnable() {
 			
 			@Override
@@ -74,9 +60,15 @@ public class PlayerView extends Activity {
 				s.setText(msg);
 			}
 		});
-		try {
-			Thread.sleep(1500);
-		} catch (Exception e) {}
+		if (sleep > 0) {
+			try {
+				Thread.sleep(sleep);
+			} catch (Exception e) {}
+		}
+	}
+	
+	private void setStatus(final String msg) {
+		setStatus(msg, 1500);
 	}
 	
 	@Override
@@ -99,6 +91,7 @@ public class PlayerView extends Activity {
 				SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 				if (FileSmb.startsWith("smb://")) {
 					Log.d("smbwrapper","Launch SMB: "+FileSmb);
+					setStatus("Samba URL detected...",0);
 					if (sharedPreferences.getBoolean("r1", false))
 						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
 					if (sharedPreferences.getBoolean("r2", false))
@@ -115,6 +108,7 @@ public class PlayerView extends Activity {
 					else {
 						try {
 							miniDLNAPlay(FileSmb);
+							//throw new Exception("ABC"); //CIFS Testing
 						}
 						catch (Exception e) {
 							Log.e("miniDLNA", e.getMessage());
@@ -131,12 +125,15 @@ public class PlayerView extends Activity {
 				}
 				else if (FileSmb.startsWith("http://")) {
 					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
+					setStatus("Starting HTTP...",0);
 					startHTTPStreaming("http",FileSmb);
 				}
 				else if (FileSmb.startsWith("pvr://")) {
+					setStatus("Starting PVR...",0);
 					Log.d("smbwrapper","Launch PVR: "+FileSmb);
 					Pattern pattern1 = Pattern.compile("([^/]+$)");
 					Pattern pattern2 = Pattern.compile("(.*?)\\.pvr$");
+					setStatus("Mapping channel...",0);
 					Matcher matcher1 = pattern1.matcher(FileSmb);
 					String id=null;
 					if (matcher1.find())
@@ -191,19 +188,21 @@ public class PlayerView extends Activity {
 	}
 	
 	private void miniDLNAPlay(final String FileSmb) throws Exception {
+		setStatus("Trying miniDLNA...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		String dburl="smb://10.0.1.4/2TB/minidlna/files.db";
 		SmbFileInputStream dbfile=new SmbFileInputStream(new SmbFile(dburl));
-		FileOutputStream localdbo=openFileOutput("files.db", MODE_PRIVATE);
+		FileOutputStream localdbo=new FileOutputStream( new File(getExternalFilesDir(null).getPath()+File.separator+"files.db"));
 		byte[] buf = new byte[1024*1024];
-		
+		setStatus("Transfering miniDLNA database...",0);
+		int count;
 		try {
-			while (dbfile.read(buf) > 0) localdbo.write(buf);
+			while ( (count=dbfile.read(buf)) > 0) localdbo.write(buf, 0, count);
 		} catch (Exception e) {}
 		localdbo.flush();
 		localdbo.close();
 		dbfile.close();
-		SQLiteDatabase db = SQLiteDatabase.openDatabase(getFilesDir().getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
+		SQLiteDatabase db = SQLiteDatabase.openDatabase(getExternalFilesDir(null).getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
@@ -222,6 +221,8 @@ public class PlayerView extends Activity {
 	}
 	
 	private void cifsMountPlay(final String FileSmb) throws Exception {
+		setStatus("Trying CIFS Mount...",0);
+		SD_PATH="/mnt/sdcard";
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		// Perform su to get root privileges
 		File directory = new File(SD_PATH+File.separator+"xbmcwrapper");
@@ -238,15 +239,15 @@ public class PlayerView extends Activity {
 			//Some device doesn't support UTF8
 			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
 			Log.d("Mounting CIFS", cmd);
-			if (executeSu(cmd) != 0) throw new Exception(); //Give up
+			if (executeSu(cmd) != 0) throw new Exception("ABC"); //Give up
 		}
-		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile);
 		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
 		setStatus("Launching "+pkg+" with CIFS Mounted path...");
 		LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.fromFile(new File(SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
-		startActivityForResult(LaunchIntent,25);
+				startActivityForResult(LaunchIntent,25);
 	}
 	
 	private void startHTTPStreaming(final String protocol, final String FileSmb) {
@@ -289,7 +290,8 @@ public class PlayerView extends Activity {
 	
 	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		cleanup(requestCode);
 	}
 	
@@ -298,29 +300,52 @@ public class PlayerView extends Activity {
 		cleanup(1);
 	}
 	
-	private void cleanup(int res) {
-		if (Serv != null)
-			Serv.Stop();
-		Serv=null;
-		//The file handlers may not be free right away
-		if (res == 25) {
-			for (int i=1; i<=10; i++) {
-				try {
-					String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
-					Log.d("UnMounting CIFS", cmd);
-					int r=executeSu(cmd);
-					Log.d("UnMount Result", ""+r);
-					if ( r == 0 ) break;
-					else throw new Exception();
-				} catch (Exception e) {
-					try {
-						Thread.sleep(2000);
-					} catch (Exception ie) {}
+	private void cleanup(final int res) {
+		setStatus("Cleaning up...", 500);
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				if (Serv != null)
+					Serv.Stop();
+				Serv=null;
+				if ( res == 25 && SD_PATH != null ) {
+					setStatus("Unmounting CIFS Shares...", 500);
+					//We should kill the players, otherwise unmounting is not possible
+					SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+					String cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad")+"\n";
+					executeSu(cmd);
+					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("http", "com.mxtech.videoplayer.ad")+"\n";
+					executeSu(cmd);
+					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad")+"\n";
+					executeSu(cmd);
+					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("file", "com.mxtech.videoplayer.ad")+"\n";
+					executeSu(cmd);
+					int i=1;
+					//The file handlers may not be free right away
+					for (i=1; i<=10; i++) {
+						try {
+							cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+							Log.d("UnMounting CIFS", cmd);
+							int r=executeSu(cmd);
+							Log.d("UnMount Result", ""+r);
+							if ( r == 0 ) {
+								setStatus("Success.", 1000);
+								break;
+							}
+							else throw new Exception("ABC");
+						} catch (Exception e) {
+							try {
+								Thread.sleep(2000);
+							} catch (Exception ie) {}
+						}
+					}
+					if (i>10) setStatus("FAILED!", 1000);
+					finish();
+					System.exit(0);
 				}
 			}
-		}
-		finish();
-		System.exit(0);
+		}).start();
 	}
 		
 }
