@@ -2,17 +2,24 @@ package hu.xmister.xbmcwrapper;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileInputStream;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class PlayerView extends Activity {
 	private String FileSmb="";
@@ -58,6 +65,20 @@ public class PlayerView extends Activity {
 		BB_BINARY=Math.min(BB_BINARY, BB_BINARIES.length-1);
 	}
 	
+	private void setStatus(final String msg) {
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				TextView s= (TextView) findViewById(R.id.tv_status);
+				s.setText(msg);
+			}
+		});
+		try {
+			Thread.sleep(1500);
+		} catch (Exception e) {}
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,89 +86,139 @@ public class PlayerView extends Activity {
 		StrictMode.setThreadPolicy(policy);
 		Uri extras = getIntent().getData();
 		Log.d("smbwrapper","Launch");
-		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		findBB();
 		if (extras != null) {
 			FileSmb = extras.toString();
+			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
-		if (FileSmb.startsWith("smb://")) {
-			Log.d("smbwrapper","Launch SMB: "+FileSmb);
-			if (sharedPreferences.getBoolean("r1", false))
-				FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
-			if (sharedPreferences.getBoolean("r2", false))
-				FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
-			Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-			if (FileSmb.startsWith("file://")) {
-				LaunchIntent.setPackage(sharedPreferences.getString("file", "com.mxtech.videoplayer.ad"));
-				FileSmb = FileSmb.replaceFirst("(?i)file://", "");
-				LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
-				startActivityForResult(LaunchIntent,1);
-			}
-			else {
-				try {
-					//Try to mount it using cifs for best performance
-					cifsMountPlay(FileSmb);
-				} catch (Exception e) {
-					// Failed, fall back to HTTP Stream
-					startHTTPStreaming("smb", FileSmb);
-				}
-			}
-		}
-		else if (FileSmb.startsWith("http://")) {
-			Log.d("smbwrapper","Launch HTTP: "+FileSmb);
-			startHTTPStreaming("http",FileSmb);
-		}
-		else if (FileSmb.startsWith("pvr://")) {
-			Log.d("smbwrapper","Launch PVR: "+FileSmb);
-			Pattern pattern1 = Pattern.compile("([^/]+$)");
-			Pattern pattern2 = Pattern.compile("(.*?)\\.pvr$");
-			Matcher matcher1 = pattern1.matcher(FileSmb);
-			String id=null;
-			if (matcher1.find())
-			{
-			    id=matcher1.group(1);
-			    Matcher matcher2 = pattern2.matcher(id);
-			    if (matcher2.find())
-			    	id=matcher2.group(1);
-			}
-			String pvrmap=sharedPreferences.getString("pvrmap", null);
-			if ( pvrmap != null ) {
-				StringTokenizer st = new StringTokenizer(pvrmap, ";");
-				while (st.hasMoreTokens()) {
-					String token=st.nextToken();
-					StringTokenizer sts=new StringTokenizer(token, ",");
-					if ( sts.nextToken().equals(String.valueOf((Integer.valueOf(id)+1))) ) {
-						id=sts.nextToken();
-						break;
+		setContentView(R.layout.streaming);
+		new Thread((new Runnable() {
+			
+			@Override
+			public void run() {
+				SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+				if (FileSmb.startsWith("smb://")) {
+					Log.d("smbwrapper","Launch SMB: "+FileSmb);
+					if (sharedPreferences.getBoolean("r1", false))
+						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
+					if (sharedPreferences.getBoolean("r2", false))
+						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
+					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					if (FileSmb.startsWith("file://")) {
+						String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+						setStatus("Launching "+pkg+" with local file...");
+						LaunchIntent.setPackage(pkg);
+						FileSmb = FileSmb.replaceFirst("(?i)file://", "");
+						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
+						startActivityForResult(LaunchIntent,1);
+					}
+					else {
+						try {
+							miniDLNAPlay(FileSmb);
+						}
+						catch (Exception e) {
+							Log.e("miniDLNA", e.getMessage());
+							try {
+								//Try to mount it using cifs for best performance
+								cifsMountPlay(FileSmb);
+							} catch (Exception ee) {
+								// Failed, fall back to HTTP Stream
+								Log.e("CIFS", ee.getMessage());
+								startHTTPStreaming("smb", FileSmb);
+							}
+						}
 					}
 				}
-			}
-			String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
-			startHTTPStreaming("pvr",url);
-			
-		}
-		else  {
-			Log.d("PlayerView","Not a smb -"+FileSmb+"-");	
-			Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-			
-			if (FileSmb.startsWith("/")) {
-				LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)),"video/*");
-			} else {
-				// Youtube
-				if (FileSmb.contains("youtube.com") && FileSmb.startsWith("http://")) {
-					Log.d("Open youtube","Yes");
-					String[] Ur=FileSmb.split(" ");
-					if (Ur.length>1) {
-						Log.d("Open youtube",Ur[0]);
-						LaunchIntent.setDataAndType(Uri.parse(Ur[0]),"video/*");
+				else if (FileSmb.startsWith("http://")) {
+					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
+					startHTTPStreaming("http",FileSmb);
+				}
+				else if (FileSmb.startsWith("pvr://")) {
+					Log.d("smbwrapper","Launch PVR: "+FileSmb);
+					Pattern pattern1 = Pattern.compile("([^/]+$)");
+					Pattern pattern2 = Pattern.compile("(.*?)\\.pvr$");
+					Matcher matcher1 = pattern1.matcher(FileSmb);
+					String id=null;
+					if (matcher1.find())
+					{
+					    id=matcher1.group(1);
+					    Matcher matcher2 = pattern2.matcher(id);
+					    if (matcher2.find())
+					    	id=matcher2.group(1);
 					}
-				} else
-					LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
+					String pvrmap=sharedPreferences.getString("pvrmap", null);
+					if ( pvrmap != null ) {
+						StringTokenizer st = new StringTokenizer(pvrmap, ";");
+						while (st.hasMoreTokens()) {
+							String token=st.nextToken();
+							StringTokenizer sts=new StringTokenizer(token, ",");
+							if ( sts.nextToken().equals(String.valueOf((Integer.valueOf(id)+1))) ) {
+								id=sts.nextToken();
+								break;
+							}
+						}
+					}
+					String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+					startHTTPStreaming("pvr",url);
+					
+				}
+				else  {
+					Log.d("PlayerView","Not a smb -"+FileSmb+"-");	
+					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					
+					if (FileSmb.startsWith("/")) {
+						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)),"video/*");
+					} else {
+						// Youtube
+						if (FileSmb.contains("youtube.com") && FileSmb.startsWith("http://")) {
+							Log.d("Open youtube","Yes");
+							String[] Ur=FileSmb.split(" ");
+							if (Ur.length>1) {
+								Log.d("Open youtube",Ur[0]);
+								LaunchIntent.setDataAndType(Uri.parse(Ur[0]),"video/*");
+							}
+						} else
+							LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
+					}
+					startActivityForResult(LaunchIntent,1);
+					finish();
+					return;
+				}
+				
 			}
-			startActivityForResult(LaunchIntent,1);
-			finish();
-			return;
-		}
+		})).start();
+		
+	}
+	
+	private void miniDLNAPlay(final String FileSmb) throws Exception {
+		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+		String dburl="smb://10.0.1.4/2TB/minidlna/files.db";
+		SmbFileInputStream dbfile=new SmbFileInputStream(new SmbFile(dburl));
+		FileOutputStream localdbo=openFileOutput("files.db", MODE_PRIVATE);
+		byte[] buf = new byte[1024*1024];
+		
+		try {
+			while (dbfile.read(buf) > 0) localdbo.write(buf);
+		} catch (Exception e) {}
+		localdbo.flush();
+		localdbo.close();
+		dbfile.close();
+		SQLiteDatabase db = SQLiteDatabase.openDatabase(getFilesDir().getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
+		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbfile=smbpath.substring(2);
+		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		Cursor c=db.rawQuery("SELECT ID FROM DETAILS WHERE PATH LIKE ?", new String[]{"%"+smbfile});
+		c.moveToFirst();
+		int id=c.getInt(0);
+		String mediaURL="http://10.0.1.4:8203/MediaItems/"+id+".mkv";
+		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+		Log.d("miniDLNA","Launch Player: "+mediaURL);
+		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		setStatus("Launching "+pkg+" with miniDLNA...");
+		LaunchIntent.setPackage(pkg);
+		LaunchIntent.setDataAndType(Uri.parse(mediaURL), "video/*");
+		startActivityForResult(LaunchIntent,1);
 	}
 	
 	private void cifsMountPlay(final String FileSmb) throws Exception {
@@ -171,9 +242,11 @@ public class PlayerView extends Activity {
 		}
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile);
-		LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
+		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		setStatus("Launching "+pkg+" with CIFS Mounted path...");
+		LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.fromFile(new File(SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
-		startActivityForResult(LaunchIntent,1);
+		startActivityForResult(LaunchIntent,25);
 	}
 	
 	private void startHTTPStreaming(final String protocol, final String FileSmb) {
@@ -190,7 +263,9 @@ public class PlayerView extends Activity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			LaunchIntent.setPackage(sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad"));
+			String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+			setStatus("Launching "+pkg+" with HTTP Stream from Samba...");
+			LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6), "UTF-8")), "video/*");
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
@@ -202,7 +277,9 @@ public class PlayerView extends Activity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			LaunchIntent.setPackage(sharedPreferences.getString(protocol, "com.softwinner.TvdVideo"));
+			String pkg=sharedPreferences.getString(protocol, "com.mxtech.videoplayer.ad");
+			setStatus("Launching "+pkg+" with HTTP Re-Stream");
+			LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/video"+System.currentTimeMillis()+".mpeg"), "video/*");
 		}
 		startActivityForResult(LaunchIntent,1);
@@ -213,31 +290,33 @@ public class PlayerView extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		cleanup();
+		cleanup(requestCode);
 	}
 	
 	@Override
 	public void onBackPressed() {
-		cleanup();
+		cleanup(1);
 	}
 	
-	private void cleanup() {
+	private void cleanup(int res) {
 		if (Serv != null)
 			Serv.Stop();
 		Serv=null;
 		//The file handlers may not be free right away
-		for (int i=1; i<=10; i++) {
-			try {
-				String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
-				Log.d("UnMounting CIFS", cmd);
-				int r=executeSu(cmd);
-				Log.d("UnMount Result", ""+r);
-				if ( r == 0 ) break;
-				else throw new Exception();
-			} catch (Exception e) {
+		if (res == 25) {
+			for (int i=1; i<=10; i++) {
 				try {
-					Thread.sleep(2000);
-				} catch (Exception ie) {}
+					String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+					Log.d("UnMounting CIFS", cmd);
+					int r=executeSu(cmd);
+					Log.d("UnMount Result", ""+r);
+					if ( r == 0 ) break;
+					else throw new Exception();
+				} catch (Exception e) {
+					try {
+						Thread.sleep(2000);
+					} catch (Exception ie) {}
+				}
 			}
 		}
 		finish();
