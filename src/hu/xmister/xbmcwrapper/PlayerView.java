@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -21,12 +21,85 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlayerView extends Activity {
+public class PlayerView extends android.support.v4.app.FragmentActivity {
 	private String FileSmb="";
 	private StreamOverHttp Serv=null;
 	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox"};
 	private int BB_BINARY=0;
 	private String SD_PATH=null;
+	private boolean chosen = false;
+	private DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {
+		
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			if (!chosen) cleanup(1);
+		}
+	};
+	private DialogInterface.OnCancelListener dc = new DialogInterface.OnCancelListener() {
+		
+		@Override
+		public void onCancel(DialogInterface dialog) {
+			cleanup(1);
+		}
+	};
+	private DialogInterface.OnClickListener di = new DialogInterface.OnClickListener() {
+		
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			final String FileSmbWrap=FileSmb;
+			switch (which) {
+			case 0:
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							miniDLNAPlay(FileSmbWrap);
+						}
+						catch (Exception e) {
+							Log.e("miniDLNA", e.getMessage());
+							cleanup(1);
+						}
+					}
+				}).start();
+				break;
+			case 1:
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							cifsMountPlay(FileSmbWrap);
+						}
+						catch (Exception e) {
+							Log.e("CIFS", e.getMessage());
+							cleanup(1);
+						}
+					}
+				}).start();
+				break;
+			case 2:
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							startHTTPStreaming("smb", FileSmbWrap);
+						}
+						catch (Exception e) {
+							Log.e("HTTP", e.getMessage());
+							cleanup(1);
+						}
+					}
+				}).start();
+				break;
+			default:
+				cleanup(1);
+				return;
+			}
+			chosen=true;
+		}
+	};
 	
 	private int executeSu(String cmd) {
 		try {
@@ -106,21 +179,8 @@ public class PlayerView extends Activity {
 						startActivityForResult(LaunchIntent,1);
 					}
 					else {
-						try {
-							miniDLNAPlay(FileSmb);
-							//throw new Exception("ABC"); //CIFS Testing
-						}
-						catch (Exception e) {
-							Log.e("miniDLNA", e.getMessage());
-							try {
-								//Try to mount it using cifs for best performance
-								cifsMountPlay(FileSmb);
-							} catch (Exception ee) {
-								// Failed, fall back to HTTP Stream
-								Log.e("CIFS", ee.getMessage());
-								startHTTPStreaming("smb", FileSmb);
-							}
-						}
+						MethodDialog md = new MethodDialog(di,dc,dd);
+						md.show(getSupportFragmentManager(),"method");
 					}
 				}
 				else if (FileSmb.startsWith("http://")) {
@@ -341,9 +401,9 @@ public class PlayerView extends Activity {
 						}
 					}
 					if (i>10) setStatus("FAILED!", 1000);
-					finish();
-					System.exit(0);
 				}
+				finish();
+				System.exit(0);
 			}
 		}).start();
 	}
