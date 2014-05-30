@@ -185,6 +185,8 @@ public class Go extends android.support.v4.app.FragmentActivity implements OnCli
 		editor.putString("mddb", ((EditText)findViewById(R.id.mddb)).getText().toString());
 		editor.putInt("mdcut", Integer.valueOf(((EditText)findViewById(R.id.mdcut)).getText().toString()));
 		editor.putInt("method", (Integer)MetBt.getTag());
+		editor.putBoolean("restream", ((CheckBox)findViewById(R.id.ch_restream)).isChecked());
+		editor.putBoolean("rehttp", ((CheckBox)findViewById(R.id.ch_rehttp)).isChecked());
 		editor.commit();
 	}
 	
@@ -209,10 +211,12 @@ public class Go extends android.support.v4.app.FragmentActivity implements OnCli
 		((EditText)findViewById(R.id.rto2)).setText(sharedPreferences.getString("rto2", ((EditText)findViewById(R.id.rto2)).getText().toString()));
 		((EditText)findViewById(R.id.pvrmap)).setText(sharedPreferences.getString("pvrmap", ((EditText)findViewById(R.id.pvrmap)).getText().toString()));
 		((EditText)findViewById(R.id.tvh)).setText(sharedPreferences.getString("tvh", ((EditText)findViewById(R.id.tvh)).getText().toString()));
-		((CheckBox)findViewById(R.id.r1)).setChecked(sharedPreferences.getBoolean("r1", false));
-		((CheckBox)findViewById(R.id.r2)).setChecked(sharedPreferences.getBoolean("r2", false));
+		((CheckBox)findViewById(R.id.r1)).setChecked(sharedPreferences.getBoolean("r1", ((CheckBox)findViewById(R.id.r1)).isChecked()));
+		((CheckBox)findViewById(R.id.r2)).setChecked(sharedPreferences.getBoolean("r2", ((CheckBox)findViewById(R.id.r2)).isChecked()));
 		((EditText)findViewById(R.id.mddb)).setText(sharedPreferences.getString("mddb", ((EditText)findViewById(R.id.mddb)).getText().toString()));
 		((EditText)findViewById(R.id.mdcut)).setText(String.valueOf(sharedPreferences.getInt("mdcut", Integer.valueOf(((EditText)findViewById(R.id.mdcut)).getText().toString()))));
 		di.onClick(null, sharedPreferences.getInt("method", 3));
+		((CheckBox)findViewById(R.id.ch_restream)).setChecked(sharedPreferences.getBoolean("restream", ((CheckBox)findViewById(R.id.ch_restream)).isChecked()));
+		((CheckBox)findViewById(R.id.ch_rehttp)).setChecked(sharedPreferences.getBoolean("rehttp", ((CheckBox)findViewById(R.id.ch_rehttp)).isChecked()));
 	}
 }

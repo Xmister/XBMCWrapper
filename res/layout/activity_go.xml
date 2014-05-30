@@ -331,4 +331,22 @@
         android:text="(?i)smb://cubie/2tb"
         android:width="225dp" />
 
+    <CheckBox
+        android:id="@+id/ch_restream"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pvr"
+        android:layout_below="@+id/pvr"
+        android:checked="true"
+        android:text="Re-Stream PVR" />
+
+    <CheckBox
+        android:id="@+id/ch_rehttp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pvr"
+        android:layout_toRightOf="@+id/textView1"
+        android:checked="true"
+        android:text="Re-Stream HTTP" />
+
 </RelativeLayout>

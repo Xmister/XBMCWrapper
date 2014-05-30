@@ -191,7 +191,17 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				else if (FileSmb.startsWith("http://")) {
 					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
 					setStatus("Starting HTTP...",0);
-					startHTTPStreaming("http",FileSmb);
+					if (sharedPreferences.getBoolean("rehttp", true)) {
+						startHTTPStreaming("http",FileSmb);
+					}
+					else {
+						String pkg=sharedPreferences.getString("http", "com.mxtech.videoplayer.ad");
+						setStatus("Launching "+pkg+" with URL");
+						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+						LaunchIntent.setPackage(pkg);
+						LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+						startActivityForResult(LaunchIntent,1);
+					}
 				}
 				else if (FileSmb.startsWith("pvr://")) {
 					setStatus("Starting PVR...",0);
@@ -221,7 +231,17 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						}
 					}
 					String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
-					startHTTPStreaming("pvr",url);
+					if (sharedPreferences.getBoolean("restream", true)) {
+						startHTTPStreaming("pvr",url);
+					}
+					else {
+						String pkg=sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad");
+						setStatus("Launching "+pkg+" with URL");
+						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+						LaunchIntent.setPackage(pkg);
+						LaunchIntent.setDataAndType(Uri.parse(url), "video/*");
+						startActivityForResult(LaunchIntent,1);
+					}
 					
 				}
 				else  {
