@@ -68,23 +68,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/TextView05"
+        android:layout_alignRight="@+id/pvr"
         android:layout_below="@+id/TextView05"
         android:ems="10"
         android:maxLines="1"
         android:text="(?i)smb://10.0.1.4/2tb"
-        android:width="225dp" />
-
-    <EditText
-        android:id="@+id/rto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/rfrom"
-        android:layout_alignBottom="@+id/rfrom"
-        android:layout_marginLeft="12dp"
-        android:layout_toRightOf="@+id/rfrom"
-        android:ems="10"
-        android:maxLines="1"
-        android:text="file:///mnt/sata"
         android:width="225dp" />
 
     <TextView
@@ -98,24 +86,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
-        android:id="@+id/rfrom2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rfrom"
-        android:layout_marginTop="12dp"
-        android:layout_toLeftOf="@+id/rto"
-        android:ems="10"
-        android:maxLines="1"
-        android:text="(?i)smb://cubie/2tb"
-        android:width="225dp" />
-
-    <EditText
         android:id="@+id/rto2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/rfrom2"
         android:layout_alignBottom="@+id/rfrom2"
         android:layout_alignLeft="@+id/rto"
+        android:layout_alignRight="@+id/rto"
         android:ems="10"
         android:maxLines="1"
         android:text="file:///mnt/sata"
@@ -202,15 +179,6 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <CheckBox
-        android:id="@+id/r1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/rfrom2"
-        android:layout_marginLeft="21dp"
-        android:layout_toRightOf="@+id/rto"
-        android:text="Enable" />
-
-    <CheckBox
         android:id="@+id/r2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -234,7 +202,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/TextView07"
         android:layout_alignBottom="@+id/TextView07"
-        android:layout_alignRight="@+id/button1"
+        android:layout_alignRight="@+id/r2"
         android:layout_toRightOf="@+id/TextView05"
         android:ems="10"
         android:maxLines="1"
@@ -261,6 +229,106 @@
         android:ems="10"
         android:maxLines="1"
         android:text="localhost"
+        android:width="225dp" />
+
+    <TextView
+        android:id="@+id/TextView09"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView08"
+        android:layout_below="@+id/TextView06"
+        android:text="Samba Method"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/bt_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/TextView09"
+        android:layout_alignBottom="@+id/TextView09"
+        android:layout_alignLeft="@+id/tvh"
+        android:layout_alignRight="@+id/tvh"
+        android:text="Button" />
+
+    <TextView
+        android:id="@+id/TextView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/pvr"
+        android:layout_alignLeft="@+id/TextView09"
+        android:text="MiniDLNA Database file"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/mddb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView10"
+        android:layout_alignRight="@+id/bt_method"
+        android:layout_below="@+id/TextView10"
+        android:ems="10"
+        android:text="smb://10.0.1.4/2TB/minidlna/files.db" />
+
+    <EditText
+        android:id="@+id/mdcut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/TextView11"
+        android:layout_alignRight="@+id/TextView09"
+        android:layout_toRightOf="@+id/TextView11"
+        android:ems="10"
+        android:inputType="number"
+        android:text="2" />
+
+    <TextView
+        android:id="@+id/TextView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/mdcut"
+        android:layout_toRightOf="@+id/mdcut"
+        android:text="level from path on DB search"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/TextView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/mddb"
+        android:layout_below="@+id/pvr"
+        android:text="Cut the first"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <CheckBox
+        android:id="@+id/r1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rto"
+        android:layout_alignRight="@+id/TextView12"
+        android:text="Enable" />
+
+    <EditText
+        android:id="@+id/rto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rfrom2"
+        android:layout_alignLeft="@+id/TextView11"
+        android:layout_toLeftOf="@+id/r1"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="file:///mnt/sata"
+        android:width="225dp" />
+
+    <EditText
+        android:id="@+id/rfrom2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rfrom"
+        android:layout_alignRight="@+id/rfrom"
+        android:layout_below="@+id/rfrom"
+        android:layout_marginTop="13dp"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="(?i)smb://cubie/2tb"
         android:width="225dp" />
 
 </RelativeLayout>

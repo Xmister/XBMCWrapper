@@ -11,7 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
@@ -26,10 +26,45 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class Go extends Activity implements OnClickListener {
+public class Go extends android.support.v4.app.FragmentActivity implements OnClickListener {
 	
 	private TextView Montext;
-	private Button MonBt;
+	private Button MonBt, MetBt;
+	private DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {
+		
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			
+		}
+	};
+	private DialogInterface.OnCancelListener dc = new DialogInterface.OnCancelListener() {
+		
+		@Override
+		public void onCancel(DialogInterface dialog) {
+		}
+	};
+	private DialogInterface.OnClickListener di = new DialogInterface.OnClickListener() {
+		
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			MetBt.setTag(Integer.valueOf(which));
+			switch (which) {
+			case 0:
+				MetBt.setText("MiniDLNA");
+				break;
+			case 1:
+				MetBt.setText("CIFS");
+				break;
+			case 2:
+				MetBt.setText("HTTP");
+				break;
+			default:
+				MetBt.setText("Ask");
+				break;
+			}
+				
+		}
+	};
 	
 	@SuppressLint("HandlerLeak")
 	@Override
@@ -66,6 +101,16 @@ public class Go extends Activity implements OnClickListener {
 		}
 		else
 			MonBt.setClickable(true);
+		
+		MetBt=(Button) findViewById(R.id.bt_method);
+		MetBt.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				MethodDialog md = new MethodDialog(new String[]{"MiniDLNA","CIFS","HTTP","Ask"},di,dc,dd);
+				md.show(getSupportFragmentManager(),"method");
+			}
+		});
 		
 		
 	}
@@ -137,6 +182,9 @@ public class Go extends Activity implements OnClickListener {
 		editor.putString("tvh", ((EditText)findViewById(R.id.tvh)).getText().toString());
 		editor.putBoolean("r1", ((CheckBox)findViewById(R.id.r1)).isChecked());
 		editor.putBoolean("r2", ((CheckBox)findViewById(R.id.r2)).isChecked());
+		editor.putString("mddb", ((EditText)findViewById(R.id.mddb)).getText().toString());
+		editor.putInt("mdcut", Integer.valueOf(((EditText)findViewById(R.id.mdcut)).getText().toString()));
+		editor.putInt("method", (Integer)MetBt.getTag());
 		editor.commit();
 	}
 	
@@ -163,5 +211,8 @@ public class Go extends Activity implements OnClickListener {
 		((EditText)findViewById(R.id.tvh)).setText(sharedPreferences.getString("tvh", ((EditText)findViewById(R.id.tvh)).getText().toString()));
 		((CheckBox)findViewById(R.id.r1)).setChecked(sharedPreferences.getBoolean("r1", false));
 		((CheckBox)findViewById(R.id.r2)).setChecked(sharedPreferences.getBoolean("r2", false));
+		((EditText)findViewById(R.id.mddb)).setText(sharedPreferences.getString("mddb", ((EditText)findViewById(R.id.mddb)).getText().toString()));
+		((EditText)findViewById(R.id.mdcut)).setText(String.valueOf(sharedPreferences.getInt("mdcut", Integer.valueOf(((EditText)findViewById(R.id.mdcut)).getText().toString()))));
+		di.onClick(null, sharedPreferences.getInt("method", 3));
 	}
 }

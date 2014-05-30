@@ -2,7 +2,9 @@ package hu.xmister.xbmcwrapper;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -179,8 +181,11 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startActivityForResult(LaunchIntent,1);
 					}
 					else {
-						MethodDialog md = new MethodDialog(di,dc,dd);
-						md.show(getSupportFragmentManager(),"method");
+						if ( sharedPreferences.getInt("method", 3) == 3 ) {
+							MethodDialog md = new MethodDialog(new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
+							md.show(getSupportFragmentManager(),"method");
+						}
+						else di.onClick(null, sharedPreferences.getInt("method", 3));
 					}
 				}
 				else if (FileSmb.startsWith("http://")) {
@@ -250,8 +255,17 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	private void miniDLNAPlay(final String FileSmb) throws Exception {
 		setStatus("Trying miniDLNA...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
-		String dburl="smb://10.0.1.4/2TB/minidlna/files.db";
-		SmbFileInputStream dbfile=new SmbFileInputStream(new SmbFile(dburl));
+		String dburl=sharedPreferences.getString("mddb", "smb://10.0.1.4/2TB/minidlna/files.db");
+		InputStream dbfile;
+		if ( dburl.startsWith("smb://") ) {
+			dbfile=new SmbFileInputStream(new SmbFile(dburl));
+		}
+		else {
+			if (dburl.startsWith("file://") ) {
+				dburl=dburl.replaceFirst("(?i)file://", "");
+			}
+			dbfile=new FileInputStream(new File(dburl));
+		}
 		FileOutputStream localdbo=new FileOutputStream( new File(getExternalFilesDir(null).getPath()+File.separator+"files.db"));
 		byte[] buf = new byte[1024*1024];
 		setStatus("Transfering miniDLNA database...",0);
@@ -265,8 +279,9 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(getExternalFilesDir(null).getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
-		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		for (int x=0; x<sharedPreferences.getInt("mdcut", 2); x++) {
+			smbfile=smbfile.substring(smbfile.indexOf('/')+1);
+		}
 		Cursor c=db.rawQuery("SELECT ID FROM DETAILS WHERE PATH LIKE ?", new String[]{"%"+smbfile});
 		c.moveToFirst();
 		int id=c.getInt(0);
