@@ -37,8 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="false"
-        android:layout_alignRight="@+id/TextView03"
-        android:text="Players"
+        android:text="CIFS Mount Path"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <EditText
@@ -348,5 +347,16 @@
         android:layout_toRightOf="@+id/textView1"
         android:checked="true"
         android:text="Re-Stream HTTP" />
+
+    <EditText
+        android:id="@+id/cifs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/file"
+        android:layout_marginLeft="14dp"
+        android:layout_toRightOf="@+id/TextView02"
+        android:ems="10"
+        android:text="/mnt/xbmcwrapper" />
 
 </RelativeLayout>

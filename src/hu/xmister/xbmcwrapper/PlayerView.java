@@ -28,7 +28,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	private StreamOverHttp Serv=null;
 	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox"};
 	private int BB_BINARY=0;
-	private String SD_PATH=null;
+	private String MOUNT_PATH=null;
 	private boolean chosen = false;
 	private DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {
 		
@@ -317,31 +317,31 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	
 	private void cifsMountPlay(final String FileSmb) throws Exception {
 		setStatus("Trying CIFS Mount...",0);
-		SD_PATH="/mnt/sdcard";
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
 		// Perform su to get root privileges
-		File directory = new File(SD_PATH+File.separator+"xbmcwrapper");
+		File directory = new File(MOUNT_PATH);
 		directory.mkdirs();
-		String cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		String cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
 		executeSu(cmd); //Just to make sure there is no stuck mount.
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-		cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+		cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
 		Log.d("Mounting CIFS", cmd);
 		if (executeSu(cmd) != 0) {
 			//Some device doesn't support UTF8
-			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
 			Log.d("Mounting CIFS", cmd);
 			if (executeSu(cmd) != 0) throw new Exception("ABC"); //Give up
 		}
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		Log.d("smbwrapper","Launch Player: "+SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile);
+		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
 		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
 		setStatus("Launching "+pkg+" with CIFS Mounted path...");
 		LaunchIntent.setPackage(pkg);
-		LaunchIntent.setDataAndType(Uri.fromFile(new File(SD_PATH+File.separator+"xbmcwrapper"+File.separator+smbfile)), "video/*");
+		LaunchIntent.setDataAndType(Uri.fromFile(new File(MOUNT_PATH+File.separator+smbfile)), "video/*");
 				startActivityForResult(LaunchIntent,25);
 	}
 	
@@ -404,7 +404,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				if (Serv != null)
 					Serv.Stop();
 				Serv=null;
-				if ( res == 25 && SD_PATH != null ) {
+				if ( res == 25 && MOUNT_PATH != null ) {
 					setStatus("Unmounting CIFS Shares...", 500);
 					//We should kill the players, otherwise unmounting is not possible
 					SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
@@ -420,7 +420,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					//The file handlers may not be free right away
 					for (i=1; i<=10; i++) {
 						try {
-							cmd=BB_BINARIES[BB_BINARY]+" umount "+SD_PATH+File.separator+"xbmcwrapper"+"\n";
+							cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
 							Log.d("UnMounting CIFS", cmd);
 							int r=executeSu(cmd);
 							Log.d("UnMount Result", ""+r);

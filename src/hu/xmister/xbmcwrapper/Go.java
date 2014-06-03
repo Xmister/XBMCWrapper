@@ -187,6 +187,7 @@ public class Go extends android.support.v4.app.FragmentActivity implements OnCli
 		editor.putInt("method", (Integer)MetBt.getTag());
 		editor.putBoolean("restream", ((CheckBox)findViewById(R.id.ch_restream)).isChecked());
 		editor.putBoolean("rehttp", ((CheckBox)findViewById(R.id.ch_rehttp)).isChecked());
+		editor.putString("cifs", ((EditText)findViewById(R.id.cifs)).getText().toString());
 		editor.commit();
 	}
 	
@@ -218,5 +219,6 @@ public class Go extends android.support.v4.app.FragmentActivity implements OnCli
 		di.onClick(null, sharedPreferences.getInt("method", 3));
 		((CheckBox)findViewById(R.id.ch_restream)).setChecked(sharedPreferences.getBoolean("restream", ((CheckBox)findViewById(R.id.ch_restream)).isChecked()));
 		((CheckBox)findViewById(R.id.ch_rehttp)).setChecked(sharedPreferences.getBoolean("rehttp", ((CheckBox)findViewById(R.id.ch_rehttp)).isChecked()));
+		((EditText)findViewById(R.id.cifs)).setText(sharedPreferences.getString("cifs", ((EditText)findViewById(R.id.cifs)).getText().toString()));
 	}
 }
