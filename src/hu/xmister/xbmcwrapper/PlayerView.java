@@ -320,9 +320,11 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
 		// Perform su to get root privileges
-		File directory = new File(MOUNT_PATH);
-		directory.mkdirs();
-		String cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
+		String cmd=BB_BINARIES[BB_BINARY]+" mkdir -p "+MOUNT_PATH+"\n";
+		executeSu(cmd);
+		cmd=BB_BINARIES[BB_BINARY]+" chmod 777 "+MOUNT_PATH+"\n";
+		executeSu(cmd);
+		cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
 		executeSu(cmd); //Just to make sure there is no stuck mount.
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
@@ -331,7 +333,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
 		Log.d("Mounting CIFS", cmd);
 		if (executeSu(cmd) != 0) {
-			//Some device doesn't support UTF8
+			//Some devices don't support UTF8
 			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
 			Log.d("Mounting CIFS", cmd);
 			if (executeSu(cmd) != 0) throw new Exception("ABC"); //Give up
