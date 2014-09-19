@@ -320,12 +320,16 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
 		// Perform su to get root privileges
-		String cmd=BB_BINARIES[BB_BINARY]+" mkdir -p "+MOUNT_PATH+"\n";
+		String cmd=BB_BINARIES[BB_BINARY]+" mount -o remount,rw /\n";
+		executeSu(cmd);
+		cmd=BB_BINARIES[BB_BINARY]+" mkdir -p "+MOUNT_PATH+"\n";
 		executeSu(cmd);
 		cmd=BB_BINARIES[BB_BINARY]+" chmod 777 "+MOUNT_PATH+"\n";
 		executeSu(cmd);
 		cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
 		executeSu(cmd); //Just to make sure there is no stuck mount.
+		cmd=BB_BINARIES[BB_BINARY]+" mount -o remount,ro /\n";
+		executeSu(cmd);
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
