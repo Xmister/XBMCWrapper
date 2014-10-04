@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/TableLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/pvrText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PVR"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+            android:id="@+id/pvr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:maxLines="1"
+            android:text="com.softwinner.TvdVideo"
+            android:width="300dp" >
+
+            <requestFocus />
+        </EditText>
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+        android:id="@+id/TextView07"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PVR Mapping"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+        android:id="@+id/pvrmap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="9,3;10,2;3,4;4,7;5,9;6,11;1,12;2,14;7,13;8,1"/>
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+        android:id="@+id/TextView08"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TVHeadend Host"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <EditText
+        android:id="@+id/tvh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:maxLines="1"
+        android:text="localhost" />
+    </TableRow>
+    
+    <CheckBox
+        android:id="@+id/ch_restream"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Re-Stream PVR" />
+
+</TableLayout>
