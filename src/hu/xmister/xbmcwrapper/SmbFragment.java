@@ -122,30 +122,45 @@ public class SmbFragment extends Fragment {
 	}
 	
 	public void save() {
-		SharedPreferences sharedPreferences = getActivity().getSharedPreferences("default", 0);
-		Editor editor = sharedPreferences.edit();
-		editor.putString("samba", ((EditText) getActivity().findViewById(R.id.samba))
-				.getText().toString());
-		editor.putString("rfrom", ((EditText) getActivity().findViewById(R.id.rfrom))
-				.getText().toString());
-		editor.putString("rto", ((EditText) getActivity().findViewById(R.id.rto)).getText()
-				.toString());
-		editor.putString("rfrom2", ((EditText) getActivity().findViewById(R.id.rfrom2))
-				.getText().toString());
-		editor.putString("rto2", ((EditText) getActivity().findViewById(R.id.rto2)).getText()
-				.toString());
-		editor.putBoolean("r1", ((CheckBox) getActivity().findViewById(R.id.r1)).isChecked());
-		editor.putBoolean("r2", ((CheckBox) getActivity().findViewById(R.id.r2)).isChecked());
-		editor.putString("cifs", ((EditText) getActivity().findViewById(R.id.cifs)).getText()
-				.toString());
-		editor.putInt("method", (Integer) MetBt.getTag());
-		editor.commit();
+		if (getActivity() != null) {
+			try {
+			SharedPreferences sharedPreferences = getActivity()
+					.getSharedPreferences("default", 0);
+			Editor editor = sharedPreferences.edit();
+			editor.putString("samba",
+					((EditText) getActivity().findViewById(R.id.samba))
+							.getText().toString());
+			editor.putString("rfrom",
+					((EditText) getActivity().findViewById(R.id.rfrom))
+							.getText().toString());
+			editor.putString("rto",
+					((EditText) getActivity().findViewById(R.id.rto)).getText()
+							.toString());
+			editor.putString("rfrom2",
+					((EditText) getActivity().findViewById(R.id.rfrom2))
+							.getText().toString());
+			editor.putString("rto2",
+					((EditText) getActivity().findViewById(R.id.rto2))
+							.getText().toString());
+			editor.putBoolean("r1",
+					((CheckBox) getActivity().findViewById(R.id.r1))
+							.isChecked());
+			editor.putBoolean("r2",
+					((CheckBox) getActivity().findViewById(R.id.r2))
+							.isChecked());
+			editor.putString("cifs",
+					((EditText) getActivity().findViewById(R.id.cifs))
+							.getText().toString());
+			editor.putInt("method", (Integer) MetBt.getTag());
+			editor.commit();
+			} catch (Exception e) {}
+		}
 	}
 	
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		save();
+		((Go)getActivity()).save();
 	}
 }

@@ -67,29 +67,33 @@ public class PvrFragment extends Fragment {
 	}
 
 	public void save() {
-		SharedPreferences sharedPreferences = getActivity()
-				.getSharedPreferences("default", 0);
-		Editor editor = sharedPreferences.edit();
-		editor.putString("pvr", ((EditText) getActivity()
-				.findViewById(R.id.pvr)).getText().toString());
-		editor.putString("pvrmap",
-				((EditText) getActivity().findViewById(R.id.pvrmap)).getText()
-						.toString());
-		editor.putString("tvh", ((EditText) getActivity()
-				.findViewById(R.id.tvh)).getText().toString());
-		editor.putBoolean("restream",
-				((CheckBox) getActivity().findViewById(R.id.ch_restream))
-						.isChecked());
-		editor.putBoolean("pvrEnable",
-				((CheckBox) getActivity().findViewById(R.id.ch_pvrEnable))
-						.isChecked());
-		editor.commit();
+		if (getActivity() != null) {
+			try {
+			SharedPreferences sharedPreferences = getActivity()
+					.getSharedPreferences("default", 0);
+			Editor editor = sharedPreferences.edit();
+			editor.putString("pvr", ((EditText) getActivity()
+					.findViewById(R.id.pvr)).getText().toString());
+			editor.putString("pvrmap",
+					((EditText) getActivity().findViewById(R.id.pvrmap)).getText()
+							.toString());
+			editor.putString("tvh", ((EditText) getActivity()
+					.findViewById(R.id.tvh)).getText().toString());
+			editor.putBoolean("restream",
+					((CheckBox) getActivity().findViewById(R.id.ch_restream))
+							.isChecked());
+			editor.putBoolean("pvrEnable",
+					((CheckBox) getActivity().findViewById(R.id.ch_pvrEnable))
+							.isChecked());
+			editor.commit();
+			} catch (Exception e) {}
+		}
 	}
 
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		save();
+		((Go)getActivity()).save();
 	}
 }

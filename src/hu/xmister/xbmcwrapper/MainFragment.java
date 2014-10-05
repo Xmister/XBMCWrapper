@@ -14,9 +14,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
-import android.content.res.AssetFileDescriptor;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 
 public class MainFragment extends Fragment implements OnClickListener {
@@ -48,7 +47,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View layoutView = inflater
-				.inflate(R.layout.otherfrag, container, false);
+				.inflate(R.layout.mainfrag, container, false);
 		return layoutView;
 	}
 
@@ -78,49 +77,137 @@ public class MainFragment extends Fragment implements OnClickListener {
 	}
 
 	private void saveXML() {
-		AssetManager assetManager = getActivity().getAssets();
-		InputStream is;
-		AssetFileDescriptor fd;
-		try {
-			fd = assetManager.openFd("playercorefactory");
-			is = fd.createInputStream();
-		} catch (IOException e1) {
-			Montext.setText("Is error");
-			return;
-		}
-		if (is == null) {
-			Montext.setText("Is null");
-			return;
-		}
+		if (getActivity() != null) {
+			AssetManager assetManager = getActivity().getAssets();
+			SharedPreferences sharedPreferences = getActivity()
+					.getSharedPreferences("default", 0);
+			InputStream is;
+			long length = 0;
+			try {
+				is = assetManager.open("playercorefactory", AssetManager.ACCESS_BUFFER);
+				length=is.available();
+			} catch (IOException e1) {
+				Montext.setText("IO error");
+				return;
+			}
 
-		OutputStream os;
-		try {
-			os = new FileOutputStream(
-					Environment.getExternalStorageDirectory().getPath()
-							+ "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
-			byte[] buffer = new byte[(int) fd.getLength()];
-			is.read(buffer);
-			is.close();
-			String xml = new String(buffer);
-			if (((CheckBox) getActivity().findViewById(R.id.ch_pvrEnable)).isChecked()) {
-				xml=xml.replace("!PVR!","<rule protocols=\"pvr\" player=\"XBMCWrapper\" />");
-			}
-			else {
-				xml=xml.replace("!PVR!","");
-			}
-			buffer=xml.getBytes();
+			OutputStream os;
+			try {
+				os = new FileOutputStream(
+						Environment.getExternalStorageDirectory().getPath()
+								+ "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
+				byte[] buffer = new byte[(int) length];
+				is.read(buffer);
+				is.close();
+				String xml = new String(buffer);
+				String temp = new String("<rule protocols=\"smb\" name=\"XBMCWrapper\" >\n");
+				if (sharedPreferences.getInt("resolution", 1) != 0) {
+					for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+						switch (i) {
+						case 1:
+							temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
+							temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+							break;
+						case 2:
+							temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\"/>\n";
+							temp += "\t<rule filename=\".*720.*\" player=\"XBMCWrapper\"/>\n";
+							break;
+						case 3:
+							temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\"/>\n";
+							temp += "\t<rule filename=\".*1080.*\" player=\"XBMCWrapper\"/>\n";
+							break;
+						}
+					}
+				}
+				temp+="</rule>\n";
+				xml = xml
+						.replace("!SMB!",
+								temp);
+				if (sharedPreferences.getBoolean("pvrEnable",true)) {
+					temp = new String("<rule protocols=\"pvr\" player=\"XBMCWrapper\" >\n");
+					if (sharedPreferences.getInt("resolution", 1) != 0) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+							switch (i) {
+							case 1:
+								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							case 2:
+								temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*720.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							case 3:
+								temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*1080.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							}
+						}
+					}
+					temp +="</rule>\n";
+					xml = xml
+							.replace("!PVR!",
+									temp);
+				} else {
+					xml = xml.replace("!PVR!", "");
+				}
+				if (sharedPreferences.getBoolean("xmlvideo",true)) {
+					temp = new String("");
+					if (sharedPreferences.getInt("resolution", 1) != 0) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+							switch (i) {
+							case 1:
+								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\">\n\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n\t</rule>";
+								break;
+							case 2:
+								temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\">\n\t<rule filename=\".*720.*\" player=\"XBMCWrapper\"/>\n\t</rule>";
+								break;
+							case 3:
+								temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\">\n\t<rule filename=\".*1080.*\" player=\"XBMCWrapper\"/>\n\t</rule>";
+								break;
+							}
+						}
+					} else temp="<rule video=\"true\" player=\"XBMCWrapper\"/>\n";
+					temp +="\n";
+					temp +="<rule dvdimage=\"true\" player=\"XBMCWrapper\" >\n";
+					if (sharedPreferences.getInt("resolution", 1) != 0) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+							switch (i) {
+							case 1:
+								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							case 2:
+								temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							case 3:
+								temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								break;
+							}
+						}
+					}
+					temp +="</rule>\n<rule protocols=\"rtmp\" player=\"XBMCWrapper\"/>\n<rule protocols=\"rtsp\" player=\"XBMCWrapper\" />\n<rule protocols=\"sop\" player=\"XBMCWrapper\" />";
+					xml = xml
+							.replace("!VIDEO!",
+									temp);
+				} else {
+					xml = xml.replace("!VIDEO!", "");
+				}
+				buffer = xml.getBytes();
 				os.write(buffer, 0, buffer.length);
-			os.close();
-		} catch (Exception e) {
-			Montext.setText("Error !!" + e.getMessage());
-			return;
+				os.close();
+			} catch (Exception e) {
+				Montext.setText("Error !!" + e.getMessage());
+				return;
+			}
 		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		saveXML();
-		Montext.setText("Install ok :-)");
+		Montext.setText("Install ok");
 	}
 
 	public void save() {
@@ -135,6 +222,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		save();
+		((Go)getActivity()).save();
 	}
 }

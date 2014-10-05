@@ -49,7 +49,7 @@ public class Go extends FragmentActivity {
 	                		licenseCheck();
 	                	break;
 	                default:
-	                	
+	                	licenseOK();
 	                }
 	            }
 	        });
@@ -100,8 +100,19 @@ public class Go extends FragmentActivity {
 	}
 	
 	public void licenseFail() {
-		Toast.makeText(getApplicationContext(), "License check failed!", Toast.LENGTH_LONG).show();
-		System.exit(0);
+				Toast.makeText(getApplicationContext(),
+						"License check failed!", Toast.LENGTH_LONG).show();
+		new Thread((new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3000);
+				}
+				catch (Exception e) {};
+				System.exit(0);
+			}
+		})).start();
 	}
 
 	@Override
@@ -198,11 +209,11 @@ public class Go extends FragmentActivity {
 		}
 	}
 
-	private void save() {
-		MainFragment.init(0).save();
+	public void save() {
 		SmbFragment.init(1).save();
 		PvrFragment.init(2).save();
 		OtherFragment.init(3).save();
+		MainFragment.init(0).save();
 	}
 
 	@Override

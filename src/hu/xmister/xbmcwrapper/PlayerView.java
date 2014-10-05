@@ -60,7 +60,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	                		licenseCheck();
 	                	break;
 	                default:
-	                	
+	                	licenseOK();
 	                }
 	            }
 	        });
@@ -220,8 +220,14 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	}
 	
 	public void licenseFail() {
-		setStatus("License check failed!", 3000);
-		System.exit(0);
+		new Thread((new Runnable() {
+
+			@Override
+			public void run() {
+				setStatus("License check failed!", 3000);
+				System.exit(0);
+			}
+		})).start();
 	}
     
 	private DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {

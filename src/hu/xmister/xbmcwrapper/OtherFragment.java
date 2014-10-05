@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
@@ -14,6 +17,7 @@ public class OtherFragment extends Fragment {
 
 	int fragVal;
 	static OtherFragment frag = null;
+	private SeekBar sb;
 
 	static OtherFragment init(int val) {
 		if (frag == null) {
@@ -61,34 +65,88 @@ public class OtherFragment extends Fragment {
 		((CheckBox) getActivity().findViewById(R.id.ch_rehttp)).setChecked(sharedPreferences
 				.getBoolean("rehttp",
 						((CheckBox) getActivity().findViewById(R.id.ch_rehttp)).isChecked()));
+		((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).setChecked(sharedPreferences
+				.getBoolean("xmlvideo",
+						((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).isChecked()));
+		((SeekBar) getActivity().findViewById(R.id.resolution)).setProgress(sharedPreferences.getInt("resolution", ((SeekBar) getActivity().findViewById(R.id.resolution)).getProgress()));
+		sb=(SeekBar)getActivity().findViewById(R.id.resolution);
+		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				TextView tv= (TextView) getActivity().findViewById(R.id.otherTextView17);
+				switch (progress) {
+				case 0:
+					tv.setText("ALL");
+					break;
+				case 1:
+					tv.setText("540p");
+					break;
+				case 2:
+					tv.setText("720p");
+					break;
+				case 3:
+					tv.setText("1080p");
+					break;
+				}
+				
+			}
+		});
 	}
 	
 	public void save() {
-		SharedPreferences sharedPreferences = getActivity().getSharedPreferences("default", 0);
-		Editor editor = sharedPreferences.edit();
-		 editor.putString("http", ((EditText)
-		 getActivity().findViewById(R.id.http)).getText()
-		 .toString());
-		 editor.putString("file", ((EditText)
-		 getActivity().findViewById(R.id.file)).getText()
-		 .toString());
-		
-		 editor.putString("mddb", ((EditText)
-		 getActivity().findViewById(R.id.mddb)).getText()
-		 .toString());
-		 editor.putInt("mdcut", Integer
-		 .valueOf(((EditText) getActivity().findViewById(R.id.mdcut)).getText()
-		 .toString()));
-		
-		 editor.putBoolean("rehttp",
-		 ((CheckBox) getActivity().findViewById(R.id.ch_rehttp)).isChecked());
-		editor.commit();
+		if (getActivity() != null) {
+			try {
+			SharedPreferences sharedPreferences = getActivity()
+					.getSharedPreferences("default", 0);
+			Editor editor = sharedPreferences.edit();
+			editor.putString("http",
+					((EditText) getActivity().findViewById(R.id.http))
+							.getText().toString());
+			editor.putString("file",
+					((EditText) getActivity().findViewById(R.id.file))
+							.getText().toString());
+
+			editor.putString("mddb",
+					((EditText) getActivity().findViewById(R.id.mddb))
+							.getText().toString());
+			editor.putInt(
+					"mdcut",
+					Integer.valueOf(((EditText) getActivity().findViewById(
+							R.id.mdcut)).getText().toString()));
+
+			editor.putBoolean("rehttp",
+					((CheckBox) getActivity().findViewById(R.id.ch_rehttp))
+							.isChecked());
+			editor.putBoolean("xmlvideo",
+					((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo))
+							.isChecked());
+			editor.putInt(
+					"resolution",
+					Integer.valueOf(((SeekBar) getActivity().findViewById(
+							R.id.resolution)).getProgress()));
+			editor.commit();
+			} catch (Exception e) {}
+		}
 	}
 	
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		save();
+		((Go)getActivity()).save();
 	}
 }
