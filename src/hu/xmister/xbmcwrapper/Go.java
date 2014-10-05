@@ -1,11 +1,6 @@
 package hu.xmister.xbmcwrapper;
 
-import java.io.File;
-
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
