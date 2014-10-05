@@ -1,6 +1,7 @@
 package hu.xmister.xbmcwrapper;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,17 +13,76 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
+import com.google.android.vending.licensing.LicenseChecker;
+import com.google.android.vending.licensing.LicenseCheckerCallback;
+import com.google.android.vending.licensing.ServerManagedPolicy;
+import com.google.android.vending.licensing.AESObfuscator;
+import hu.xmister.xbmcwrapper.License;
 
 public class Go extends FragmentActivity {
 
 	static final int ITEMS = 4;
 	MyAdapter mAdapter;
 	ViewPager mPager;
+	private Handler mHandler;
+	private LicenseCheckerCallback mLicenseCheckerCallback;
+    private LicenseChecker mChecker;
+    private static final String BASE64_PUBLIC_KEY = License.getKey();
+	
+	private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
+	    public void allow(int reason) {
+	        if (isFinishing()) {
+	            // Don't update UI if Activity is finishing.
+	            return;
+	        }
+	        // Should allow user access.
+	        displayResult(getString(R.string.allow));
+	    }
+
+	    public void dontAllow(int reason) {
+	        if (isFinishing()) {
+	            // Don't update UI if Activity is finishing.
+	            return;
+	        }
+	        displayResult(getString(R.string.dont_allow));
+	        
+	        if (reason == Policy.RETRY) {
+	            // If the reason received from the policy is RETRY, it was probably
+	            // due to a loss of connection with the service, so we should give the
+	            // user a chance to retry. So show a dialog to retry.
+	            showDialog(DIALOG_RETRY);
+	        } else {
+	            // Otherwise, the user is not licensed to use this app.
+	            // Your response should always inform the user that the application
+	            // is not licensed, but your behavior at that point can vary. You might
+	            // provide the user a limited access version of your app or you can
+	            // take them to Google Play to purchase the app.
+	            showDialog(DIALOG_GOTOMARKET);
+	        }
+	    }
+
+		@Override
+		public void applicationError(int errorCode) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mHandler = new Handler();
 		setContentView(R.layout.activity_go);
+		// Construct the LicenseCheckerCallback. The library calls this when done.
+        mLicenseCheckerCallback = new MyLicenseCheckerCallback();
+
+        // Construct the LicenseChecker with a Policy.
+        mChecker = new LicenseChecker(
+            this, new ServerManagedPolicy(this,
+                new AESObfuscator(SALT, getPackageName(), deviceId)),
+            BASE64_PUBLIC_KEY  // Your public licensing key.
+            );
+        mChecker.checkAccess(mLicenseCheckerCallback);
 		mAdapter = new MyAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mAdapter);
