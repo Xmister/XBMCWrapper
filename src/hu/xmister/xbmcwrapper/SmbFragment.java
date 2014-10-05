@@ -138,6 +138,7 @@ public class SmbFragment extends Fragment {
 		editor.putBoolean("r2", ((CheckBox) getActivity().findViewById(R.id.r2)).isChecked());
 		editor.putString("cifs", ((EditText) getActivity().findViewById(R.id.cifs)).getText()
 				.toString());
+		editor.putInt("method", (Integer) MetBt.getTag());
 		editor.commit();
 	}
 	

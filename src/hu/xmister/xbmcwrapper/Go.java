@@ -56,10 +56,12 @@ public class Go extends FragmentActivity {
 		@Override
 		public Fragment getItem(int position) {
 			switch (position) {
-			case 0:
-				return SmbFragment.init(0);
-			case 1: 
-				return PvrFragment.init(1);
+			case 1:
+				return SmbFragment.init(1);
+			case 2: 
+				return PvrFragment.init(2);
+			case 3:
+				return OtherFragment.init(3);
 			default:
 				return new DetailFragment();
 			}
@@ -86,48 +88,14 @@ public class Go extends FragmentActivity {
 	}
 
 	private void save() {
-		SmbFragment.init(0).save();
-		PvrFragment.init(1).save();
-		// editor.putString("http", ((EditText)
-		// findViewById(R.id.http)).getText()
-		// .toString());
-		// editor.putString("file", ((EditText)
-		// findViewById(R.id.file)).getText()
-		// .toString());
-		
-		// editor.putString("mddb", ((EditText)
-		// findViewById(R.id.mddb)).getText()
-		// .toString());
-		// editor.putInt("mdcut", Integer
-		// .valueOf(((EditText) findViewById(R.id.mdcut)).getText()
-		// .toString()));
-		// editor.putInt("method", (Integer) MetBt.getTag());
-		
-		// editor.putBoolean("rehttp",
-		// ((CheckBox) findViewById(R.id.ch_rehttp)).isChecked());
+		SmbFragment.init(1).save();
+		PvrFragment.init(2).save();
+		OtherFragment.init(3).save();
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		//((EditText) findViewById(R.id.http)).setText(sharedPreferences
-		//		.getString("http", ((EditText) findViewById(R.id.http))
-		//				.getText().toString()));
-		
-		//((EditText) findViewById(R.id.file)).setText(sharedPreferences
-		//		.getString("file", ((EditText) findViewById(R.id.file))
-		//				.getText().toString()));
-		//((EditText) findViewById(R.id.mddb)).setText(sharedPreferences
-		//		.getString("mddb", ((EditText) findViewById(R.id.mddb))
-		//				.getText().toString()));
-		//((EditText) findViewById(R.id.mdcut)).setText(String
-		//		.valueOf(sharedPreferences.getInt("mdcut", Integer
-		//				.valueOf(((EditText) findViewById(R.id.mdcut))
-		//						.getText().toString()))));
-		//((CheckBox) findViewById(R.id.ch_rehttp)).setChecked(sharedPreferences
-		//		.getBoolean("rehttp",
-		//				((CheckBox) findViewById(R.id.ch_rehttp)).isChecked()));
 	}
 }
 
