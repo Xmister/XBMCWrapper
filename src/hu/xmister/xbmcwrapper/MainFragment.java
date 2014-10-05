@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.StringTokenizer;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -102,7 +103,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 				String xml = new String(buffer);
 				String temp = new String("<rule protocols=\"smb\" name=\"XBMCWrapper\" >\n");
 				if (sharedPreferences.getInt("resolution", 1) != 0) {
-					for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+					for (int i = sharedPreferences.getInt("resolution", 1); i <= 3; i++) {
 						switch (i) {
 						case 1:
 							temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
@@ -126,7 +127,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 				if (sharedPreferences.getBoolean("pvrEnable",true)) {
 					temp = new String("<rule protocols=\"pvr\" player=\"XBMCWrapper\" >\n");
 					if (sharedPreferences.getInt("resolution", 1) != 0) {
-						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 3; i++) {
 							switch (i) {
 							case 1:
 								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
@@ -143,6 +144,11 @@ public class MainFragment extends Fragment implements OnClickListener {
 							}
 						}
 					}
+					StringTokenizer st = new StringTokenizer(sharedPreferences.getString("excludepvr","1,2"),",");
+					while (st.hasMoreTokens()) {
+						String t=st.nextToken();
+						temp += "\t<rule filename=\".*"+String.valueOf(Integer.parseInt(t)-1)+".pvr\" player=\"dvdplayer\"/>\n";
+					}
 					temp +="</rule>\n";
 					xml = xml
 							.replace("!PVR!",
@@ -153,7 +159,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 				if (sharedPreferences.getBoolean("xmlvideo",true)) {
 					temp = new String("");
 					if (sharedPreferences.getInt("resolution", 1) != 0) {
-						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 3; i++) {
 							switch (i) {
 							case 1:
 								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\">\n\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n\t</rule>";
@@ -170,7 +176,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 					temp +="\n";
 					temp +="<rule dvdimage=\"true\" player=\"XBMCWrapper\" >\n";
 					if (sharedPreferences.getInt("resolution", 1) != 0) {
-						for (int i = sharedPreferences.getInt("resolution", 1); i <= 2; i++) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 3; i++) {
 							switch (i) {
 							case 1:
 								temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";

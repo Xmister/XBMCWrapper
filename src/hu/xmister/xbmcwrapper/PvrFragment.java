@@ -56,6 +56,10 @@ public class PvrFragment extends Fragment {
 				.setText(sharedPreferences.getString("tvh",
 						((EditText) getActivity().findViewById(R.id.tvh))
 								.getText().toString()));
+		((EditText) getActivity().findViewById(R.id.excludePvr))
+		.setText(sharedPreferences.getString("excludepvr",
+				((EditText) getActivity().findViewById(R.id.excludePvr))
+						.getText().toString()));
 		((CheckBox) getActivity().findViewById(R.id.ch_restream))
 				.setChecked(sharedPreferences.getBoolean("restream",
 						((CheckBox) getActivity()
@@ -79,6 +83,8 @@ public class PvrFragment extends Fragment {
 							.toString());
 			editor.putString("tvh", ((EditText) getActivity()
 					.findViewById(R.id.tvh)).getText().toString());
+			editor.putString("excludepvr", ((EditText) getActivity()
+					.findViewById(R.id.excludePvr)).getText().toString());
 			editor.putBoolean("restream",
 					((CheckBox) getActivity().findViewById(R.id.ch_restream))
 							.isChecked());

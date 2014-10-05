@@ -172,7 +172,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="Minimum resolution"
             android:indeterminate="false"
-            android:max="2"
+            android:max="3"
             android:progress="1" />
 
     </TableRow>
@@ -186,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="720p"
+            android:text="540p"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
     </TableRow>
