@@ -13,8 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
+
 import com.google.android.vending.licensing.LicenseChecker;
 import com.google.android.vending.licensing.LicenseCheckerCallback;
+import com.google.android.vending.licensing.Policy;
 import com.google.android.vending.licensing.ServerManagedPolicy;
 import com.google.android.vending.licensing.AESObfuscator;
 import hu.xmister.xbmcwrapper.License;
@@ -28,15 +30,37 @@ public class Go extends FragmentActivity {
 	private LicenseCheckerCallback mLicenseCheckerCallback;
     private LicenseChecker mChecker;
     private static final String BASE64_PUBLIC_KEY = License.getKey();
+    private static final byte[] SALT = License.getSalt();
+    public int retryCount=0;
 	
 	private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
+		private void resultHandler(final int res) {
+	        mHandler.post(new Runnable() {
+	            public void run() {
+	                switch (res) {
+	                case 1:
+	                	licenseFail();
+	                	break;
+	                case 2:
+	                	retryCount++;
+	                	if ( retryCount > 3)
+	                		licenseFail();
+	                	else
+	                		licenseCheck();
+	                	break;
+	                default:
+	                	
+	                }
+	            }
+	        });
+	    }
 	    public void allow(int reason) {
 	        if (isFinishing()) {
 	            // Don't update UI if Activity is finishing.
 	            return;
 	        }
 	        // Should allow user access.
-	        displayResult(getString(R.string.allow));
+	        resultHandler(0);
 	    }
 
 	    public void dontAllow(int reason) {
@@ -44,20 +68,19 @@ public class Go extends FragmentActivity {
 	            // Don't update UI if Activity is finishing.
 	            return;
 	        }
-	        displayResult(getString(R.string.dont_allow));
 	        
 	        if (reason == Policy.RETRY) {
 	            // If the reason received from the policy is RETRY, it was probably
 	            // due to a loss of connection with the service, so we should give the
 	            // user a chance to retry. So show a dialog to retry.
-	            showDialog(DIALOG_RETRY);
+	        	resultHandler(2);
 	        } else {
 	            // Otherwise, the user is not licensed to use this app.
 	            // Your response should always inform the user that the application
 	            // is not licensed, but your behavior at that point can vary. You might
 	            // provide the user a limited access version of your app or you can
 	            // take them to Google Play to purchase the app.
-	            showDialog(DIALOG_GOTOMARKET);
+	        	resultHandler(1);
 	        }
 	    }
 
@@ -66,6 +89,19 @@ public class Go extends FragmentActivity {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+	
+	public void licenseOK() {
+		
+	}
+	
+	public void licenseCheck() {
+		mChecker.checkAccess(mLicenseCheckerCallback);
+	}
+	
+	public void licenseFail() {
+		Toast.makeText(getApplicationContext(), "License check failed!", Toast.LENGTH_LONG).show();
+		System.exit(0);
 	}
 
 	@Override
@@ -79,10 +115,10 @@ public class Go extends FragmentActivity {
         // Construct the LicenseChecker with a Policy.
         mChecker = new LicenseChecker(
             this, new ServerManagedPolicy(this,
-                new AESObfuscator(SALT, getPackageName(), deviceId)),
-            BASE64_PUBLIC_KEY  // Your public licensing key.
+                new AESObfuscator(SALT, getPackageName(), License.getID(this))),
+            BASE64_PUBLIC_KEY 
             );
-        mChecker.checkAccess(mLicenseCheckerCallback);
+        licenseCheck();
 		mAdapter = new MyAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mAdapter);
@@ -173,4 +209,10 @@ public class Go extends FragmentActivity {
 	protected void onStart() {
 		super.onStart();
 	}
+	
+	@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mChecker.onDestroy();
+    }
 }
