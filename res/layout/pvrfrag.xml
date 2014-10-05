@@ -3,7 +3,20 @@
     android:id="@+id/TableLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+	
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
+        <CheckBox
+        android:id="@+id/ch_pvrEnable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Handle PVR Videos" />
+    </TableRow>
+    
     <TableRow
         android:id="@+id/tableRow1"
         android:layout_width="wrap_content"

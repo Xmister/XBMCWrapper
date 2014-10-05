@@ -19,7 +19,7 @@
 		
         <rule protocols="sop" player="XBMCWrapper" />
         
-        <rule protocols="pvr" player="XBMCWrapper" />
+        !PVR!
         
 		
 		<!-- Internet streams -- Disabled for now -->

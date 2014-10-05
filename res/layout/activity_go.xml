@@ -20,6 +20,13 @@
         android:gravity="center"
         android:measureWithLargestChild="true"
         android:orientation="horizontal" >
+        
+        <Button
+            android:id="@+id/mainFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Main" >
+        </Button>
  
         <Button
             android:id="@+id/smbFragment"
@@ -43,56 +50,3 @@
     </LinearLayout>
  
 </LinearLayout>
-
-
-<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/FrameLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clickable="false"
-    tools:context=".Go" >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
-        android:text="SmbWrapper By Guth Stéphane for XBMC" />
-
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="XBMC Wrapper by Xmister, based on" />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="14dp"
-        android:clickable="false"
-        android:text="Install playercorefactory.xml" />
-
-    
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="27dp"
-        android:text="playercorefactory.xml not found !"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-
-    
-
-    
-
-
-        
-
-
-    
-
-</FrameLayout> -->

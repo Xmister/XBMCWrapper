@@ -1,8 +1,12 @@
 package hu.xmister.xbmcwrapper;
 
+import java.io.File;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +20,7 @@ import android.widget.*;
 
 public class Go extends FragmentActivity {
 
-	static final int ITEMS = 10;
+	static final int ITEMS = 4;
 	MyAdapter mAdapter;
 	ViewPager mPager;
 
@@ -31,16 +35,30 @@ public class Go extends FragmentActivity {
 		Button button = (Button) findViewById(R.id.smbFragment);
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				mPager.setCurrentItem(0);
+				mPager.setCurrentItem(1);
 			}
 		});
 		button = (Button) findViewById(R.id.pvrFragment);
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				mPager.setCurrentItem(1);
+				mPager.setCurrentItem(2);
 			}
 		});
-
+		button = (Button) findViewById(R.id.otherFragment);
+		button.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				mPager.setCurrentItem(3);
+			}
+		});
+		button = (Button) findViewById(R.id.mainFragment);
+		button.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				mPager.setCurrentItem(0);
+			}
+		});
+		StrictMode.ThreadPolicy policy = new
+			StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
 	}
 
 	public static class MyAdapter extends FragmentPagerAdapter {
@@ -56,6 +74,8 @@ public class Go extends FragmentActivity {
 		@Override
 		public Fragment getItem(int position) {
 			switch (position) {
+			case 0:
+				return MainFragment.init(0);
 			case 1:
 				return SmbFragment.init(1);
 			case 2: 
@@ -63,7 +83,7 @@ public class Go extends FragmentActivity {
 			case 3:
 				return OtherFragment.init(3);
 			default:
-				return new DetailFragment();
+				return MainFragment.init(0);
 			}
 		}
 	}
@@ -88,6 +108,7 @@ public class Go extends FragmentActivity {
 	}
 
 	private void save() {
+		MainFragment.init(0).save();
 		SmbFragment.init(1).save();
 		PvrFragment.init(2).save();
 		OtherFragment.init(3).save();
@@ -103,7 +124,7 @@ public class Go extends FragmentActivity {
  * public class Go extends android.support.v4.app.FragmentActivity implements
  * OnClickListener {
  * 
- * private TextView Montext; private Button MonBt, MetBt; private
+ * , MetBt; private
  * 
  * 
  * @SuppressLint("HandlerLeak")
@@ -115,49 +136,15 @@ public class Go extends FragmentActivity {
  * if (extras != null) { FileSmb = extras.toString(); } Log.d("Start",
  * "Fichier:"+FileSmb); setContentView(R.layout.activity_go);
  * 
- * StrictMode.ThreadPolicy policy = new
- * StrictMode.ThreadPolicy.Builder().permitAll().build();
- * StrictMode.setThreadPolicy(policy);
- * 
- * 
- * Montext=(TextView) findViewById(R.id.status); MonBt=(Button)
- * findViewById(R.id.button1); MonBt.setOnClickListener(this);
- * 
- * 
- * File PlayerC=new File(Environment.getExternalStorageDirectory().getPath()+
- * "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml"); if
- * (PlayerC.exists()) Montext.setText("playercorefactory.xml already exist");
- * else Montext.setText("playercorefactory.xml not found");
- * 
- * File XbmcC=new File(Environment.getExternalStorageDirectory().getPath()+
- * "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata"); if
- * (!XbmcC.isDirectory()) { Montext.setText("XBMC not found !!");
- * MonBt.setClickable(false); } else MonBt.setClickable(true);
  * 
  * 
  * 
- * @Override public boolean onCreateOptionsMenu(Menu menu) { // Inflate the
- * menu; this adds items to the action bar if it is present.
- * getMenuInflater().inflate(R.menu.activity_go, menu); return true; }
  * 
- * @Override public boolean onOptionsItemSelected(MenuItem item) { // Handle
- * item selection switch (item.getItemId()) { case R.id.menu_save: save();
- * return true; default: return super.onOptionsItemSelected(item); } }
  * 
- * @Override public void onClick(View v) { AssetManager assetManager =
- * this.getAssets(); InputStream is; try { is =
- * assetManager.open("playercorefactory"); } catch (IOException e1) {
- * Montext.setText("Is error"); return; } if (is == null) {
- * Montext.setText("Is null"); return; }
  * 
- * OutputStream os; try { os = new
- * FileOutputStream(Environment.getExternalStorageDirectory().getPath()+
- * "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
- * byte[] buffer = new byte[4096]; int length; while ((length = is.read(buffer))
- * > 0) { os.write(buffer, 0, length); } os.close(); is.close(); } catch
- * (Exception e) { Montext.setText("Error !!"+e.getMessage() ); return; }
  * 
- * Montext.setText("Install ok :-)"); }
+ * 
+ * 
  * 
  * private void save() { SharedPreferences sharedPreferences =
  * getSharedPreferences("default", 0); Editor editor = sharedPreferences.edit();
