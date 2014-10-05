@@ -87,7 +87,7 @@ public class Go extends FragmentActivity {
 		@Override
 		public void applicationError(int errorCode) {
 			// TODO Auto-generated method stub
-			
+			resultHandler(1);
 		}
 	}
 	
