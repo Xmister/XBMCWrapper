@@ -451,12 +451,13 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			commands.add("mount -t cifs -o user=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
 			commands.add("mount -t cifs -o user=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
 		}
-		int i=0;
+		int i=0,res=0;
 		do {
 			cmd=BB_BINARIES[BB_BINARY]+" "+commands.get(i++)+"\n";
 			Log.d("Mounting CIFS", cmd);
-		} while (executeSu(cmd) != 0 && i<commands.size());
-		if (executeSu(cmd) != 0) throw new Exception("Unable to mount"); //Give up
+			res=executeSu(cmd);
+		} while ( res!= 0 && i<commands.size());
+		if (res != 0) throw new Exception("Unable to mount"); //Give up
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
 		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
