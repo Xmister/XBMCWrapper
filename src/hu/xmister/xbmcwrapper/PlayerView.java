@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -435,14 +436,27 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
-		cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
-		Log.d("Mounting CIFS", cmd);
-		if (executeSu(cmd) != 0) {
-			//Some devices don't support UTF8
-			cmd=BB_BINARIES[BB_BINARY]+" mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH+"\n";
-			Log.d("Mounting CIFS", cmd);
-			if (executeSu(cmd) != 0) throw new Exception("ABC"); //Give up
+		String smbuser=sharedPreferences.getString("smbuser","");
+		String smbpass=sharedPreferences.getString("smbpass","");
+		ArrayList<String> commands = new ArrayList<String>();
+		if ( !smbuser.equals("") ) {
+			commands.add("mount -t cifs -o username="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o username="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o user="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o user="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
 		}
+		else {
+			commands.add("mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o user=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			commands.add("mount -t cifs -o user=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+		}
+		int i=0;
+		do {
+			cmd=BB_BINARIES[BB_BINARY]+" "+commands.get(i++)+"\n";
+			Log.d("Mounting CIFS", cmd);
+		} while (executeSu(cmd) != 0 && i<commands.size());
+		if (executeSu(cmd) != 0) throw new Exception("Unable to mount"); //Give up
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
 		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
@@ -458,8 +472,13 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+FileSmb);
 		if ( protocol.equals("smb") ) {
+			String smbuser=sharedPreferences.getString("smbuser", "");
+			String smbpass=sharedPreferences.getString("smbpass", "");
 			if (Serv == null) {
-				Serv=new StreamOverHttp(protocol,FileSmb);
+				if ( !smbuser.equals(""))
+					Serv=new StreamOverHttp(protocol,FileSmb,smbuser,smbpass);
+				else
+					Serv=new StreamOverHttp(protocol,FileSmb);
 				Serv.start();
 			}
 			

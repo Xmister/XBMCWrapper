@@ -103,7 +103,7 @@
             android:id="@+id/mddb"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="other://10.0.1.4/2TB/minidlna/files.db" />
+            android:text="smb://10.0.1.4/2TB/minidlna/files.db" />
     </TableRow>
 
     <TableLayout

@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
 import android.annotation.SuppressLint;
@@ -27,6 +28,8 @@ public class Sending extends Thread {
 	   private SmbFileInputStream _SmbStream=null;
 	   private InputStream _Stream=null;
 	   private InputStream inS=null;
+	   private String _SmbUser=null;
+	   private String _SmbPass=null;
 	   
 	   private static final String 
 	      HTTP_BADREQUEST = "400 Bad Request",
@@ -40,7 +43,13 @@ public class Sending extends Thread {
 	   public Sending(Socket sock,StreamOverHttp Del) {
 		   _Socket=sock;
 		   _Del=Del;
-	}
+	   }
+	   public Sending(Socket sock,StreamOverHttp Del,String username, String password) {
+		   _Socket=sock;
+		   _Del=Del;
+		   _SmbUser=username;
+		   _SmbPass=password;
+	   }
 
 	@Override
 	   public void run() {
@@ -207,7 +216,11 @@ public class Sending extends Thread {
          URI=URI.substring(1);
          
          if (_Del.getProtocol().equals("smb")) {
-        	 SmbFile MonFichier=new SmbFile("smb://"+Uri.decode(URI));
+        	 SmbFile MonFichier;
+        	 if ( _SmbUser != null )
+        		 MonFichier=new SmbFile("smb://"+Uri.decode(URI),new NtlmPasswordAuthentication(null, _SmbUser, _SmbPass));
+        	 else
+        		 MonFichier=new SmbFile("smb://"+Uri.decode(URI));
              if (MonFichier.isDirectory()) {
              	Log.d("decodeHeader","Directory not allowed");
                  return "401";

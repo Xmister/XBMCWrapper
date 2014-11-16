@@ -118,6 +118,12 @@ public class SmbFragment extends Fragment {
 		((EditText) getActivity().findViewById(R.id.cifs)).setText(sharedPreferences
 				.getString("cifs", ((EditText) getActivity().findViewById(R.id.cifs))
 						.getText().toString()));
+		((EditText) getActivity().findViewById(R.id.smbuser)).setText(sharedPreferences
+				.getString("smbuser", ((EditText) getActivity().findViewById(R.id.smbuser))
+						.getText().toString()));
+		((EditText) getActivity().findViewById(R.id.smbpass)).setText(sharedPreferences
+				.getString("smbpass", ((EditText) getActivity().findViewById(R.id.smbpass))
+						.getText().toString()));
 		di.onClick(null, sharedPreferences.getInt("method", 3));
 	}
 	
@@ -150,6 +156,12 @@ public class SmbFragment extends Fragment {
 							.isChecked());
 			editor.putString("cifs",
 					((EditText) getActivity().findViewById(R.id.cifs))
+							.getText().toString());
+			editor.putString("smbuser",
+					((EditText) getActivity().findViewById(R.id.smbuser))
+							.getText().toString());
+			editor.putString("smbpass",
+					((EditText) getActivity().findViewById(R.id.smbpass))
 							.getText().toString());
 			editor.putInt("method", (Integer) MetBt.getTag());
 			editor.commit();

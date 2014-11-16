@@ -125,6 +125,57 @@
                 android:text="file:///mnt/sata" />
         </TableRow>
     </TableLayout>
+    <TableRow
+        android:id="@+id/smbTableRow10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba user"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/smbuser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/smbTableRow12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba password"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/smbpass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </TableRow>
 
     <TableRow
         android:id="@+id/smbTableRow5"
@@ -132,7 +183,7 @@
         android:layout_height="wrap_content" >
 
         <TextView
-            android:id="@+id/TextView09"
+            android:id="@+id/TextView14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Samba Method"

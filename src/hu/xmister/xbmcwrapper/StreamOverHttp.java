@@ -15,6 +15,8 @@ public class StreamOverHttp extends Thread {
    private int port=0;
    private String protocol = "smb";
    private String url;
+   private String _SmbUser=null;
+   private String _SmbPass=null;
    
    public synchronized int getPort() {
 	   return port;
@@ -28,19 +30,27 @@ public class StreamOverHttp extends Thread {
 	   return protocol;
    }
    
-   public StreamOverHttp() {
-	   
-   }
-   
-   public StreamOverHttp(String protocol, String url) {
-	   this.protocol=protocol;
-	   this.url=url;
+   private void startStreaming() {
 	   port=37689;
 	   try {
 		   serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
 	   } catch (Exception e) {
 		   port=0;
 	   }
+   }
+   
+   public StreamOverHttp(String protocol, String url) {
+	   this.protocol=protocol;
+	   this.url=url;
+	   startStreaming();
+   }
+   
+   public StreamOverHttp(String protocol, String url, String sambaUser, String sambaPass) {
+	   this.protocol=protocol;
+	   this.url=url;
+	   _SmbUser=sambaUser;
+	   _SmbPass=sambaPass;
+	   startStreaming();
    }
    
    @Override
@@ -78,7 +88,7 @@ public class StreamOverHttp extends Thread {
 		}
 		
 		if (Sock != null) {
-			Sending SendSock=new Sending(Sock,this);
+			Sending SendSock=new Sending(Sock,this,_SmbUser,_SmbPass);
 			SendSock.start();
 		}
 		else
