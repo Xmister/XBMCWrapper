@@ -25,6 +25,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 	static MainFragment frag = null;
 	TextView Montext;
 	Button MonBt;
+	private final String XBMC_DIRS[]={"/Android/data/org.xbmc.xbmc/files/.xbmc", "/Android/data/org.xbmc.kodi/files/.xbmc", "/Android/data/org.xbmc.kodi/files/.kodi", "/Android/data/org.kodi.kodi/files/.kodi"};
+	private int XBMC_DIR=0;
 
 	static MainFragment init(int val) {
 		if (frag == null) {
@@ -59,22 +61,31 @@ public class MainFragment extends Fragment implements OnClickListener {
 		Montext = (TextView) getActivity().findViewById(R.id.status);
 		MonBt = (Button) getActivity().findViewById(R.id.button1);
 		MonBt.setOnClickListener(this);
-
-		File PlayerC = new File(
-				Environment.getExternalStorageDirectory().getPath()
-						+ "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
-		if (PlayerC.exists())
-			Montext.setText("playercorefactory.xml already exist");
-		else
-			Montext.setText("playercorefactory.xml not found");
-
-		File XbmcC = new File(Environment.getExternalStorageDirectory()
-				.getPath() + "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata");
+		
+		File XbmcC = null;
+		
+		for (int i=0; i<XBMC_DIRS.length; i++) {
+			XbmcC = new File(Environment.getExternalStorageDirectory()
+					.getPath() + XBMC_DIRS[i]+"/userdata");
+			if (XbmcC.isDirectory()) {
+				XBMC_DIR=i;
+				break;
+			}
+		}
 		if (!XbmcC.isDirectory()) {
 			Montext.setText("XBMC not found");
 			MonBt.setClickable(false);
 		} else
 			MonBt.setClickable(true);
+			File PlayerC = new File(
+					Environment.getExternalStorageDirectory().getPath()
+							+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
+			if (PlayerC.exists())
+				Montext.setText("playercorefactory.xml already exist");
+			else
+				Montext.setText("playercorefactory.xml not found");
+
+
 	}
 
 	private void saveXML() {
@@ -96,7 +107,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 			try {
 				os = new FileOutputStream(
 						Environment.getExternalStorageDirectory().getPath()
-								+ "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
+								+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
 				byte[] buffer = new byte[(int) length];
 				is.read(buffer);
 				is.close();
@@ -219,7 +230,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 	public void save() {
 		File PlayerC = new File(
 				Environment.getExternalStorageDirectory().getPath()
-						+ "/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/playercorefactory.xml");
+						+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
 		if (PlayerC.exists())
 			saveXML();
 	}

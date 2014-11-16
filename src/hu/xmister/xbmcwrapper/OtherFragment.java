@@ -68,7 +68,6 @@ public class OtherFragment extends Fragment {
 		((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).setChecked(sharedPreferences
 				.getBoolean("xmlvideo",
 						((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).isChecked()));
-		((SeekBar) getActivity().findViewById(R.id.resolution)).setProgress(sharedPreferences.getInt("resolution", ((SeekBar) getActivity().findViewById(R.id.resolution)).getProgress()));
 		sb=(SeekBar)getActivity().findViewById(R.id.resolution);
 		sb.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
@@ -105,6 +104,8 @@ public class OtherFragment extends Fragment {
 				
 			}
 		});
+		sb.setProgress(sharedPreferences.getInt("resolution", sb.getProgress()));
+		
 	}
 	
 	public void save() {
