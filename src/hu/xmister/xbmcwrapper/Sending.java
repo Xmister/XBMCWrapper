@@ -149,13 +149,14 @@ public class Sending extends Thread {
 	            sendCount = endAt - startFrom + 1;
 	            if(sendCount < 0)
 	               sendCount = 0;
-	            status = "206 Partial Content";
 	            if (_Del.getProtocol().equals("smb"))
-	            		_SmbStream.skip(startFrom);
+            		_SmbStream.skip(startFrom);
+
+            	status = "206 Partial Content";
+            	String rangeSpec = "bytes " + startFrom + "-" + endAt + "/"+_FileSize;
+	            headers.put("Content-Range", rangeSpec);
 	
 	            headers.put("Content-Length", "" + sendCount);
-	            String rangeSpec = "bytes " + startFrom + "-" + endAt + "/*";
-	            headers.put("Content-Range", rangeSpec);
             }
             else {
             	status = "200 OK";
