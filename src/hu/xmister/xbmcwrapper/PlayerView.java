@@ -489,7 +489,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
 			setStatus("Launching "+pkg+" with HTTP Stream from Samba...");
 			LaunchIntent.setPackage(pkg);
-			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6), "UTF-8")), "video/*");
+			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), "UTF-8")), "video/*");
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {

@@ -12,7 +12,7 @@ public class StreamOverHttp extends Thread {
 
    public Boolean Stoping=false;
    private ServerSocket serverSocket=null;
-   private int port=0;
+   private int port=37689;
    private String protocol = "smb";
    private String url;
    private String _SmbUser=null;
@@ -30,19 +30,27 @@ public class StreamOverHttp extends Thread {
 	   return protocol;
    }
    
-   private void startStreaming() {
-	   port=37689;
-	   try {
-		   serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
-	   } catch (Exception e) {
-		   port=0;
-	   }
+   private void startStreaming() throws IOException {
+			serverSocket = new ServerSocket();
+			serverSocket.setSoTimeout(500);
+			boolean suc=false;
+			do {
+				try {
+					serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
+					suc=true;
+					break;
+				} catch (Exception e) {
+					Random r = new Random(System.currentTimeMillis());
+					port=r.nextInt(32000);
+					port+=10000;
+				}
+			} while (suc == false);
+			
    }
    
    public StreamOverHttp(String protocol, String url) {
 	   this.protocol=protocol;
 	   this.url=url;
-	   startStreaming();
    }
    
    public StreamOverHttp(String protocol, String url, String sambaUser, String sambaPass) {
@@ -50,7 +58,6 @@ public class StreamOverHttp extends Thread {
 	   this.url=url;
 	   _SmbUser=sambaUser;
 	   _SmbPass=sambaPass;
-	   startStreaming();
    }
    
    @Override
@@ -58,22 +65,7 @@ public class StreamOverHttp extends Thread {
 	// Create socket
 	
 	try {
-		serverSocket = new ServerSocket();
-		serverSocket.setSoTimeout(500);
-		while (port == 0) {
-			try {
-				Random r = new Random(System.currentTimeMillis());
-				port=r.nextInt(32000);
-				port+=10000;
-				serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
-				break;
-			} catch (Exception e) {
-				port=0;
-				//TODO
-			}
-		}
-		
-		
+		startStreaming();
 	} catch (IOException e) {
 		Log.d("ServiceHttp", "Socket already in use , abort");
 		return;
@@ -94,6 +86,12 @@ public class StreamOverHttp extends Thread {
 		else
 			break;
 	} 
+	if (serverSocket!=null) {
+		   try {
+			serverSocket.close();
+			serverSocket=null;
+		} catch (IOException e) {}
+	   }
    }
    
    public void Stop() {
