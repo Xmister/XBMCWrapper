@@ -361,6 +361,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
 		setContentView(R.layout.streaming);
+		
+		
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
