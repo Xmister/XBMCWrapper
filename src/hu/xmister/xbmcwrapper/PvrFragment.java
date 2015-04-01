@@ -141,7 +141,7 @@ public class PvrFragment extends Fragment {
 			editor.putBoolean("pvrEnable",
 					((CheckBox) getActivity().findViewById(R.id.ch_pvrEnable))
 							.isChecked());
-			editor.putInt("backed", (Integer) PVRBt.getTag());
+			editor.putInt("backend", (Integer) PVRBt.getTag());
 			editor.commit();
 			} catch (Exception e) {}
 		}
