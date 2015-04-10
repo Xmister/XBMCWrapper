@@ -157,7 +157,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					setStatus("Starting PVR...",0);
 					Log.d("smbwrapper","Launch PVR: "+FileSmb);
 					Pattern pattern1 = Pattern.compile("([^/]+$)");
-					Pattern pattern2 = Pattern.compile("(.*?)\\.pvr$");
+					Pattern pattern2 = Pattern.compile("([0-9]*?)\\.pvr$");
 					setStatus("Mapping channel...",0);
 					Matcher matcher1 = pattern1.matcher(FileSmb);
 					String id=null;
@@ -168,6 +168,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					    if (matcher2.find())
 					    	id=matcher2.group(1);
 					}
+					String kodid=id;
+					setStatus("Mapping channel "+kodid+"->",0);
 					String pvrmap=sharedPreferences.getString("pvrmap", null);
 					if ( pvrmap != null ) {
 						StringTokenizer st = new StringTokenizer(pvrmap, ";");
@@ -180,8 +182,9 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							}
 						}
 					}
+					setStatus("Mapping channel "+kodid+" -> "+id,1000);
 					String url=null;
-					String host=sharedPreferences.getString("tvh", "localhost:9981");
+					String host=sharedPreferences.getString("tvh", "localhost");
 			    	String port=null;
 			    	int pp=host.indexOf(':');
 			    	if ( pp > -1 ) {
@@ -240,9 +243,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
 					}
 					startActivityForResult(LaunchIntent,1);
-					CLEANUP:
-						finish();
-						return;
+					finish();
+					return;
 				}
 				
 			}
