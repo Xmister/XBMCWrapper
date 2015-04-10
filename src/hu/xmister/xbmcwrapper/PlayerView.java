@@ -181,10 +181,10 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					}
 					switch ( sharedPreferences.getInt("backend", 1) ) {
 					    case 1:
-						String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+						String url="http://"+sharedPreferences.getString("tvh", "localhost:9981")+"/stream/channelid/"+id+"?mux=pass";
 						break;
 					    case 2:
-						String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+						String url="http://"+sharedPreferences.getString("tvh", "localhost:7522")+":/upnp/channelstream/"+id+".ts";
 						break;
 					    default:
 						String url=null;
