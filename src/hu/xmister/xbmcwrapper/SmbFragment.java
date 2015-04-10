@@ -89,7 +89,7 @@ public class SmbFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				MethodDialog md = new MethodDialog(new String[] { "MiniDLNA",
+				ChoiceDialog md = new ChoiceDialog("Choose a method",new String[] { "MiniDLNA",
 						"CIFS", "HTTP", "Ask" }, di, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "method");
 			}

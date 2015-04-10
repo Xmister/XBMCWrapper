@@ -12,6 +12,41 @@ import android.widget.EditText;
 
 public class PvrFragment extends Fragment {
 	int fragVal;
+	DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {
+
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+
+		}
+	};
+	private DialogInterface.OnCancelListener dc = new DialogInterface.OnCancelListener() {
+
+		@Override
+		public void onCancel(DialogInterface dialog) {
+		}
+	};
+	private DialogInterface.OnClickListener di = new DialogInterface.OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			PVRBt.setTag(Integer.valueOf(which));
+			switch (which) {
+			case 1:
+				PVRBt.setText("TvHeadend");
+				break;
+			case 2:
+				PVRBt.setText("DVBViewer");
+				break;
+			case 0:
+			default:
+				PVRBt.setText("Disabled");
+				break;
+			}
+
+		}
+	};
+	Button PVRBt;
+	
 	static PvrFragment frag;
 
 	static PvrFragment init(int val) {
@@ -44,6 +79,16 @@ public class PvrFragment extends Fragment {
 		super.onViewStateRestored(savedInstanceState);
 		SharedPreferences sharedPreferences = getActivity()
 				.getSharedPreferences("default", 0);
+		PVRBt = (Button) getActivity().findViewById(R.id.bt_backend);
+		PVRBt.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ChoiceDialog md = new ChoiceDialog("Choose a backend",new String[] { "Disabled",
+						"TvHeadend", "DVBViewer" }, di, dc, dd);
+				md.show(getActivity().getSupportFragmentManager(), "backend");
+			}
+		});
 		((EditText) getActivity().findViewById(R.id.pvr))
 				.setText(sharedPreferences.getString("pvr",
 						((EditText) getActivity().findViewById(R.id.pvr))
@@ -68,6 +113,8 @@ public class PvrFragment extends Fragment {
 		.setChecked(sharedPreferences.getBoolean("pvrEnable",
 				((CheckBox) getActivity()
 						.findViewById(R.id.ch_pvrEnable)).isChecked()));
+						
+		di.onClick(null, sharedPreferences.getInt("backend", 1));
 	}
 
 	public void save() {
@@ -91,6 +138,7 @@ public class PvrFragment extends Fragment {
 			editor.putBoolean("pvrEnable",
 					((CheckBox) getActivity().findViewById(R.id.ch_pvrEnable))
 							.isChecked());
+			editor.putInt("backed", (Integer) PVRBt.getTag());
 			editor.commit();
 			} catch (Exception e) {}
 		}

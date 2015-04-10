@@ -8,23 +8,25 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
 @SuppressLint("ValidFragment")
-public class MethodDialog extends DialogFragment {
+public class ChoiceDialog extends DialogFragment {
 	private DialogInterface.OnClickListener olistener;
 	private DialogInterface.OnCancelListener clistener;
 	private DialogInterface.OnDismissListener dlistener;
+	private String label;
 	private String[] options;
 	
-	public MethodDialog(String[] options,DialogInterface.OnClickListener ol, DialogInterface.OnCancelListener cl, DialogInterface.OnDismissListener cd) {
+	public MethodDialog(String label, String[] options,DialogInterface.OnClickListener ol, DialogInterface.OnCancelListener cl, DialogInterface.OnDismissListener cd) {
 		olistener=ol;	
 		clistener=cl;
 		dlistener=cd;
+		this.label=label;
 		this.options=options;
 	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	    builder.setTitle("Choose method")
+	    builder.setTitle(label)
 	           .setItems(options, olistener).setOnCancelListener(clistener);
 	    return builder.create();
 	}

@@ -149,6 +149,10 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					}
 				}
 				else if (FileSmb.startsWith("pvr://")) {
+					if ( sharedPreferences.getInt("backend", 1) == 0 ) {
+					    setStatus("PVR Disabled");
+					    return 0;
+					}
 					setStatus("Starting PVR...",0);
 					Log.d("smbwrapper","Launch PVR: "+FileSmb);
 					Pattern pattern1 = Pattern.compile("([^/]+$)");
@@ -175,7 +179,16 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							}
 						}
 					}
-					String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+					switch ( sharedPreferences.getInt("backend", 1) ) {
+					    case 1:
+						String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+						break;
+					    case 2:
+						String url="http://"+sharedPreferences.getString("tvh", "localhost")+":9981/stream/channelid/"+id+"?mux=pass";
+						break;
+					    default:
+						String url=null;
+					}
 					if (sharedPreferences.getBoolean("restream", true)) {
 						startHTTPStreaming("pvr",url);
 					}
@@ -190,7 +203,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					
 				}
 				else  {
-					Log.d("PlayerView","Not a smb -"+FileSmb+"-");	
+					Log.d("PlayerView","Redirecting protocol -"+FileSmb+"-");	
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					
 					if (FileSmb.startsWith("/")) {
