@@ -127,7 +127,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					}
 					else {
 						if ( sharedPreferences.getInt("method", 3) == 3 ) {
-							MethodDialog md = new MethodDialog(new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
+							ChoiceDialog md = new ChoiceDialog("Choose Streaming Method",new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
 							md.show(getSupportFragmentManager(),"method");
 						}
 						else di.onClick(null, sharedPreferences.getInt("method", 3));
@@ -151,7 +151,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				else if (FileSmb.startsWith("pvr://")) {
 					if ( sharedPreferences.getInt("backend", 1) == 0 ) {
 					    setStatus("PVR Disabled");
-					    return 0;
+					    finish();
+					    return;
 					}
 					setStatus("Starting PVR...",0);
 					Log.d("smbwrapper","Launch PVR: "+FileSmb);
@@ -179,15 +180,33 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							}
 						}
 					}
+					String url=null;
+					String host=sharedPreferences.getString("tvh", "localhost:9981");
+			    	String port=null;
+			    	int pp=host.indexOf(':');
+			    	if ( pp > -1 ) {
+			    		port=host.substring(pp+1);
+			    		host=host.substring(0, pp);
+			    	}
 					switch ( sharedPreferences.getInt("backend", 1) ) {
 					    case 1:
-						String url="http://"+sharedPreferences.getString("tvh", "localhost:9981")+"/stream/channelid/"+id+"?mux=pass";
-						break;
+							if (port == null) {
+								port="9981";
+							}
+							url="http://"+host+":"+port+"/stream/channelid/"+id+"?mux=pass";
+							break;
 					    case 2:
-						String url="http://"+sharedPreferences.getString("tvh", "localhost:7522")+":/upnp/channelstream/"+id+".ts";
-						break;
+					    	if (port == null) {
+								port="7522";
+							}
+							url="http://"+host+":"+port+":/upnp/channelstream/"+id+".ts";
+							break;
 					    default:
-						String url=null;
+					    	url=null;
+					}
+					if (url == null) {
+						finish();
+					    return;
 					}
 					if (sharedPreferences.getBoolean("restream", true)) {
 						startHTTPStreaming("pvr",url);
@@ -221,8 +240,9 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
 					}
 					startActivityForResult(LaunchIntent,1);
-					finish();
-					return;
+					CLEANUP:
+						finish();
+						return;
 				}
 				
 			}

@@ -15,7 +15,7 @@ public class ChoiceDialog extends DialogFragment {
 	private String label;
 	private String[] options;
 	
-	public MethodDialog(String label, String[] options,DialogInterface.OnClickListener ol, DialogInterface.OnCancelListener cl, DialogInterface.OnDismissListener cd) {
+	public ChoiceDialog(String label, String[] options,DialogInterface.OnClickListener ol, DialogInterface.OnCancelListener cl, DialogInterface.OnDismissListener cd) {
 		olistener=ol;	
 		clistener=cl;
 		dlistener=cd;
