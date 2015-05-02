@@ -124,7 +124,7 @@ public class SmbFragment extends Fragment {
 		((EditText) getActivity().findViewById(R.id.smbpass)).setText(sharedPreferences
 				.getString("smbpass", ((EditText) getActivity().findViewById(R.id.smbpass))
 						.getText().toString()));
-		di.onClick(null, sharedPreferences.getInt("method", 3));
+		di.onClick(null, sharedPreferences.getInt("method", 2));
 	}
 	
 	public void save() {

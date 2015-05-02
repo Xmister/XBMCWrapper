@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.AssetManager;
 
 public class MainFragment extends Fragment implements OnClickListener {
@@ -73,19 +75,22 @@ public class MainFragment extends Fragment implements OnClickListener {
 			}
 		}
 		if (!XbmcC.isDirectory()) {
-			Montext.setText("XBMC not found");
+			Montext.setText("XBMC/Kodi not found! Please install Kodi from www.kodi.tv, if you want to use this app!");
 			MonBt.setClickable(false);
-		} else
+		} else {
 			MonBt.setClickable(true);
 			File PlayerC = new File(
 					Environment.getExternalStorageDirectory().getPath()
 							+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
 			if (PlayerC.exists())
-				Montext.setText("playercorefactory.xml already exist");
+				Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and play it through MX Player Free (if installed).");
 			else
-				Montext.setText("playercorefactory.xml not found");
-
-
+				Montext.setText("Please click the button if you want this app to handle Kodi videos.");
+		}
+		SharedPreferences sharedPreferences = getActivity().getSharedPreferences("default", 0);
+		((CheckBox) getActivity().findViewById(R.id.ch_update)).setChecked(sharedPreferences
+				.getBoolean("ch_update",
+						((CheckBox) getActivity().findViewById(R.id.ch_update)).isChecked()));
 	}
 
 	private void saveXML() {
@@ -224,15 +229,31 @@ public class MainFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		saveXML();
-		Montext.setText("Install ok");
+		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and polay it through MX Player Free (if installed).");
 	}
 
 	public void save() {
-		File PlayerC = new File(
-				Environment.getExternalStorageDirectory().getPath()
-						+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
-		if (PlayerC.exists())
-			saveXML();
+		if (getActivity() != null) {
+			try {
+				SharedPreferences sharedPreferences = getActivity()
+						.getSharedPreferences("default", 0);
+				Editor editor = sharedPreferences.edit();
+				editor.putBoolean("ch_update",
+						((CheckBox) getActivity().findViewById(R.id.ch_update))
+								.isChecked());
+				editor.commit();
+				if (sharedPreferences
+						.getBoolean("ch_update",
+								((CheckBox) getActivity().findViewById(R.id.ch_update)).isChecked())) {
+					
+										File PlayerC = new File(
+												Environment.getExternalStorageDirectory().getPath()
+														+ XBMC_DIRS[XBMC_DIR]+"/userdata");
+										if (PlayerC.isDirectory())
+											saveXML();
+				}
+			} catch (Exception e) {}
+		}
 	}
 
 	@Override

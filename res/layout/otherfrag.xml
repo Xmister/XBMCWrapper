@@ -12,7 +12,7 @@
             android:id="@+id/TextView06"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="File"
+            android:text="File Player"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </TableRow>
 
@@ -53,7 +53,7 @@
             android:id="@+id/http"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="com.softwinner.TvdVideo" />
+            android:text="com.mxtech.videoplayer.ad" />
     </TableRow>
 
     <TableRow

@@ -33,4 +33,18 @@
         <requestFocus />
     </TableRow>
 
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <CheckBox
+            android:id="@+id/ch_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Overwrite XML automatically after changes" />
+
+    </TableRow>
+
 </TableLayout>

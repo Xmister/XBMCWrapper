@@ -130,7 +130,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 							ChoiceDialog md = new ChoiceDialog("Choose Streaming Method",new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
 							md.show(getSupportFragmentManager(),"method");
 						}
-						else di.onClick(null, sharedPreferences.getInt("method", 3));
+						else di.onClick(null, sharedPreferences.getInt("method", 2));
 					}
 				}
 				else if (FileSmb.startsWith("http://")) {

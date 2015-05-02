@@ -12,7 +12,7 @@
             android:id="@+id/TextView03"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Samba"
+            android:text="Samba Player"
             android:textAppearance="?android:attr/textAppearanceLarge" />
         
     </TableRow>
