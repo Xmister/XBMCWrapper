@@ -14,7 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="true"
-        android:text="Handle PVR Videos" />
+        android:text="Handle PVR Videos"
+            android:layout_span="1" />
     </TableRow>
 
     <TableRow
@@ -31,26 +32,23 @@
     </TableRow>
 
     <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Choose"
-            android:id="@+id/bt_pvrplayer" />
-    </TableRow>
-
-    <TableRow
-        android:id="@+id/tableRow5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+            android:id="@+id/bt_pvrplayer"
+            android:layout_column="0" />
 
         <EditText
             android:id="@+id/pvr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="com.mxtech.videoplayer.ad">
+            android:text="com.mxtech.videoplayer.ad"
+            android:layout_column="1">
 
             <requestFocus />
         </EditText>
@@ -72,25 +70,29 @@
     <TableRow
         android:id="@+id/tableRow6"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:minHeight="55dp">
 
         <EditText
             android:id="@+id/pvrmap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="9,3;10,2;3,4;4,7;5,9;6,11;1,12;2,14;7,13;8,1"
+            android:width="250dp"
+            android:hint="xbmcid,tvheadendid;xbmcid,tvheadendid;" />
+
+        <Button
+            android:id="@+id/bt_backend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9,3;10,2;3,4;4,7;5,9;6,11;1,12;2,14;7,13;8,1" />
+            android:text="Button"
+            android:layout_column="1" />
     </TableRow>
 
     <TableRow
         android:id="@+id/tableRow3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
-      
-        <Button
-            android:id="@+id/bt_backend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
 
     </TableRow>
     
@@ -129,7 +131,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Exclude the following channels"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:width="0dp" />
     </TableRow>
 
     <TableRow
@@ -144,11 +147,17 @@
             android:text="1,2" />
     </TableRow>
 
-    <CheckBox
-        android:id="@+id/ch_restream"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:text="Re-Stream PVR" />
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <CheckBox
+            android:id="@+id/ch_restream"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Re-Stream PVR"
+            android:layout_column="0" />
+    </TableRow>
 
 </TableLayout>

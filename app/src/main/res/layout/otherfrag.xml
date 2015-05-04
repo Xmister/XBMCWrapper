@@ -14,17 +14,19 @@
             android:layout_height="wrap_content"
             android:text="File Player"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose"
+            android:id="@+id/bt_fileplayer"
+            android:layout_column="1" />
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Choose"
-            android:id="@+id/bt_fileplayer" />
     </TableRow>
 
     <TableRow
@@ -53,17 +55,19 @@
             android:layout_height="wrap_content"
             android:text="HTTP"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose"
+            android:id="@+id/bt_httpplayer"
+            android:layout_column="1" />
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Choose"
-            android:id="@+id/bt_httpplayer" />
     </TableRow>
 
     <TableRow
