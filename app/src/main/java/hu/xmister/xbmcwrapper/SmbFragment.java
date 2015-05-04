@@ -107,12 +107,16 @@ public class SmbFragment extends Fragment {
 				mainIntent.setType("video/*");
 				//mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 				final List<ResolveInfo> pkgAppsList = getActivity().getPackageManager().queryIntentActivities(mainIntent, 0);
-				items = new String[pkgAppsList.size()];
+				items = new String[pkgAppsList.size()-1];
+				String[] names = new String[pkgAppsList.size()-1];
 				int i=0;
 				for (ResolveInfo ri : pkgAppsList) {
-					items[i++]=ri.resolvePackageName;
+					if ( !ri.activityInfo.packageName.equals(getActivity().getPackageName())) {
+						items[i] = ri.activityInfo.packageName;
+						names[i++] = ri.loadLabel(getActivity().getPackageManager()).toString();
+					}
 				}
-				ChoiceDialog md = new ChoiceDialog("Choose a Player", items, sdi, dc, dd);
+				ChoiceDialog md = new ChoiceDialog("Choose a Player", names, sdi, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "smbplayer");
 			}
 		});
