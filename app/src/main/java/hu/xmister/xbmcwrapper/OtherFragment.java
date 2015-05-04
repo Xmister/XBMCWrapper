@@ -35,7 +35,7 @@ public class OtherFragment extends Fragment {
 		public void onCancel(DialogInterface dialog) {
 		}
 	};
-	Button PlayBT;
+	Button FilePlayBT;
 	String[] items=null;
 	private DialogInterface.OnClickListener fdi = new DialogInterface.OnClickListener() {
 
@@ -46,6 +46,7 @@ public class OtherFragment extends Fragment {
 			}
 		}
 	};
+	Button HTTPPlayBT;
 	private DialogInterface.OnClickListener hdi = new DialogInterface.OnClickListener() {
 
 		@Override
@@ -87,8 +88,8 @@ public class OtherFragment extends Fragment {
 	public void onViewStateRestored(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
-		PlayBT = (Button) getActivity().findViewById(R.id.bt_fileplayer);
-		PlayBT.setOnClickListener(new View.OnClickListener() {
+		FilePlayBT = (Button) getActivity().findViewById(R.id.bt_fileplayer);
+		FilePlayBT.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				final Intent mainIntent = new Intent(Intent.ACTION_VIEW);
@@ -104,8 +105,8 @@ public class OtherFragment extends Fragment {
 				md.show(getActivity().getSupportFragmentManager(), "fileplayer");
 			}
 		});
-		PlayBT = (Button) getActivity().findViewById(R.id.bt_httpplayer);
-		PlayBT.setOnClickListener(new View.OnClickListener() {
+		HTTPPlayBT = (Button) getActivity().findViewById(R.id.bt_httpplayer);
+		HTTPPlayBT.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				final Intent mainIntent = new Intent(Intent.ACTION_VIEW);
