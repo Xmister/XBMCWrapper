@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <TableRow
+        android:id="@+id/smbTableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView03"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba Player"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose"
+            android:id="@+id/bt_smbplayer"
+            android:enabled="true" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/samba"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="com.mxtech.videoplayer.ad" />
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/smbTableRow8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView02"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CIFS Mount Path"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/cifs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="/mnt/xbmcwrapper" />
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/smbTableRow9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/TextView05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba Replace"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </TableRow>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TableRow
+            android:id="@+id/smbTableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/r1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/rfrom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(?i)smb://10.0.1.4/2tb" />
+
+            <EditText
+                android:id="@+id/rto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="file:///mnt/sata" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/smbTableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/r2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/rfrom2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(?i)smb://cubie/2tb" />
+
+            <EditText
+                android:id="@+id/rto2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="file:///mnt/sata" />
+        </TableRow>
+    </TableLayout>
+    <TableRow
+        android:id="@+id/smbTableRow10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba user"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/smbuser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/smbTableRow12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <TextView
+            android:id="@+id/TextView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba password"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/smbpass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/smbTableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/TextView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Samba Method"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <Button
+            android:id="@+id/bt_method"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button" />
+    </TableRow>
+
+</TableLayout>

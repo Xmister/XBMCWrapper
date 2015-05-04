@@ -1,0 +1,22 @@
+
+<playercorefactory>
+	<players>
+		<player name="XBMCWrapper" type="ExternalPlayer" audio="false" video="true">
+			<filename>hu.xmister.xbmcwrapper</filename>
+			<hidexbmc>true</hidexbmc>
+			<playcountminimumtime>120</playcountminimumtime>
+		</player>
+	</players>
+
+	<rules action="prepend">
+		!SMB!
+        
+        !PVR!
+        
+		
+		<!-- Internet streams -- Disabled for now -->
+		<!--<rule internetstream="true" player="MXPlayerFree" />-->
+
+		!VIDEO!
+	</rules>
+</playercorefactory>
