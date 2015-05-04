@@ -120,6 +120,7 @@ public class Go extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		mHandler = new Handler();
 		setContentView(R.layout.activity_go);
+		/*
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -129,7 +130,8 @@ public class Go extends FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();
+        licenseCheck();*/
+		licenseOK();
 		mAdapter = new MyAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mAdapter);
