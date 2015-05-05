@@ -123,7 +123,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						LaunchIntent.setPackage(pkg);
 						FileSmb = FileSmb.replaceFirst("(?i)file://", "");
 						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
-						startActivityForResult(LaunchIntent,1);
+						startActivityForResult(LaunchIntent, 1);
 					}
 					else {
 						if ( sharedPreferences.getInt("method", 3) == 3 ) {
@@ -132,6 +132,15 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						}
 						else di.onClick(null, sharedPreferences.getInt("method", 2));
 					}
+				}
+				else if (FileSmb.startsWith("file://")) {
+					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+					setStatus("Launching "+pkg+" with local file...");
+					LaunchIntent.setPackage(pkg);
+					FileSmb = FileSmb.replaceFirst("(?i)file://", "");
+					LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
+					startActivityForResult(LaunchIntent,1);
 				}
 				else if (FileSmb.startsWith("http://")) {
 					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
@@ -225,26 +234,12 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					
 				}
 				else  {
-					Log.d("PlayerView","Redirecting protocol -"+FileSmb+"-");	
+					String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+					setStatus("Launching " + pkg + " with URL");
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					
-					if (FileSmb.startsWith("/")) {
-						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)),"video/*");
-					} else {
-						// Youtube
-						if (FileSmb.contains("youtube.com") && FileSmb.startsWith("http://")) {
-							Log.d("Open youtube","Yes");
-							String[] Ur=FileSmb.split(" ");
-							if (Ur.length>1) {
-								Log.d("Open youtube",Ur[0]);
-								LaunchIntent.setDataAndType(Uri.parse(Ur[0]),"video/*");
-							}
-						} else
-							LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
-					}
-					startActivityForResult(LaunchIntent,1);
-					finish();
-					return;
+					LaunchIntent.setPackage(pkg);
+					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+					startActivityForResult(LaunchIntent, 1);
 				}
 				
 			}
