@@ -110,7 +110,8 @@ public class Go extends FragmentActivity {
 					Thread.sleep(3000);
 				}
 				catch (Exception e) {};
-				System.exit(0);
+				finish();
+				//System.exit(0);
 			}
 		})).start();
 	}

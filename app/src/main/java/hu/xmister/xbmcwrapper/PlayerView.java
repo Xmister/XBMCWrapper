@@ -257,7 +257,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			@Override
 			public void run() {
 				setStatus("License check failed!", 3000);
-				System.exit(0);
+				finish();
+				//System.exit(0);
 			}
 		})).start();
 	}
@@ -557,7 +558,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	
 	private void cleanup(final int res) {
 		if ( cleaning ) {
-			setStatus("Still cleaning up...please wait!", 500);
+
 		}
 		else {
 			cleaning=true;
@@ -603,7 +604,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						if (i > 10) setStatus("FAILED!", 1000);
 					}
 					finish();
-					System.exit(0);
+					//System.exit(0);
 				}
 			}).start();
 		}
