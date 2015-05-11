@@ -44,6 +44,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
     private static final String BASE64_PUBLIC_KEY = License.getKey();
     private static final byte[] SALT = License.getSalt();
     public int retryCount=0;
+	private boolean cleaning=false;
     
     private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
 		private void resultHandler(final int res) {
@@ -364,10 +365,10 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	
 	private void setStatus(final String msg, long sleep) {
 		runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				TextView s= (TextView) findViewById(R.id.tv_status);
+				TextView s = (TextView) findViewById(R.id.tv_status);
 				s.setText(msg);
 			}
 		});
@@ -428,7 +429,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		}
 		FileOutputStream localdbo=new FileOutputStream( new File(getExternalFilesDir(null).getPath()+File.separator+"files.db"));
 		byte[] buf = new byte[1024*1024];
-		setStatus("Transfering miniDLNA database...",0);
+		setStatus("Transfering miniDLNA database...", 0);
 		int count;
 		try {
 			while ( (count=dbfile.read(buf)) > 0) localdbo.write(buf, 0, count);
@@ -509,7 +510,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		Log.d("smbwrapper","Launch Player: "+FileSmb);
+		Log.d("smbwrapper", "Launch Player: " + FileSmb);
 		if ( protocol.equals("smb") ) {
 			String smbuser=sharedPreferences.getString("smbuser", "");
 			String smbpass=sharedPreferences.getString("smbpass", "");
@@ -543,7 +544,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/video"+System.currentTimeMillis()+".mpeg"), "video/*");
 		}
-		startActivityForResult(LaunchIntent,1);
+		startActivityForResult(LaunchIntent, 1);
 		
 	}
 	
@@ -557,55 +558,61 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	
 	@Override
 	public void onBackPressed() {
-		cleanup(1);
+			cleanup(1);
 	}
 	
 	private void cleanup(final int res) {
-		setStatus("Cleaning up...", 500);
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				if (Serv != null)
-					Serv.Stop();
-				Serv=null;
-				if ( res == 25 && MOUNT_PATH != null ) {
-					setStatus("Unmounting CIFS Shares...", 500);
-					//We should kill the players, otherwise unmounting is not possible
-					SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
-					String cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad")+"\n";
-					executeSu(cmd);
-					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("http", "com.mxtech.videoplayer.ad")+"\n";
-					executeSu(cmd);
-					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad")+"\n";
-					executeSu(cmd);
-					cmd=BB_BINARIES[BB_BINARY]+" killall "+sharedPreferences.getString("file", "com.mxtech.videoplayer.ad")+"\n";
-					executeSu(cmd);
-					int i=1;
-					//The file handlers may not be free right away
-					for (i=1; i<=10; i++) {
-						try {
-							cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
-							Log.d("UnMounting CIFS", cmd);
-							int r=executeSu(cmd);
-							Log.d("UnMount Result", ""+r);
-							if ( r == 0 ) {
-								setStatus("Success.", 1000);
-								break;
-							}
-							else throw new Exception("ABC");
-						} catch (Exception e) {
+		if ( cleaning ) {
+			setStatus("Still cleaning up...please wait!", 500);
+		}
+		else {
+			cleaning=true;
+			setStatus("Cleaning up...", 500);
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (Serv != null)
+						Serv.Stop();
+					Serv = null;
+					if (res == 25 && MOUNT_PATH != null) {
+						setStatus("Unmounting CIFS Shares...", 500);
+						//We should kill the players, otherwise unmounting is not possible
+						SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+						String cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad") + "\n";
+						executeSu(cmd);
+						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("http", "com.mxtech.videoplayer.ad") + "\n";
+						executeSu(cmd);
+						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad") + "\n";
+						executeSu(cmd);
+						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("file", "com.mxtech.videoplayer.ad") + "\n";
+						executeSu(cmd);
+						int i = 1;
+						//The file handlers may not be free right away
+						for (i = 1; i <= 10; i++) {
 							try {
-								Thread.sleep(2000);
-							} catch (Exception ie) {}
+								cmd = BB_BINARIES[BB_BINARY] + " umount " + MOUNT_PATH + "\n";
+								Log.d("UnMounting CIFS", cmd);
+								int r = executeSu(cmd);
+								Log.d("UnMount Result", "" + r);
+								if (r == 0) {
+									setStatus("Success.", 1000);
+									break;
+								} else throw new Exception("ABC");
+							} catch (Exception e) {
+								try {
+									Thread.sleep(2000);
+								} catch (Exception ie) {
+								}
+							}
 						}
+						if (i > 10) setStatus("FAILED!", 1000);
 					}
-					if (i>10) setStatus("FAILED!", 1000);
+					finish();
+					System.exit(0);
 				}
-				finish();
-				System.exit(0);
-			}
-		}).start();
+			}).start();
+		}
 	}
 		
 }
