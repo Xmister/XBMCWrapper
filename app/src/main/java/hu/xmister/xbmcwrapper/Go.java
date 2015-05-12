@@ -92,49 +92,10 @@ public class Go extends FragmentActivity {
 	}
 	
 	public void licenseOK() {
-		
-	}
-	
-	public void licenseCheck() {
-		mChecker.checkAccess(mLicenseCheckerCallback);
-	}
-	
-	public void licenseFail() {
-				Toast.makeText(getApplicationContext(),
-						"License check failed!", Toast.LENGTH_LONG).show();
-		new Thread((new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(3000);
-				}
-				catch (Exception e) {};
-				finish();
-				//System.exit(0);
-			}
-		})).start();
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mHandler = new Handler();
 		setContentView(R.layout.activity_go);
-		// Construct the LicenseCheckerCallback. The library calls this when done.
-        mLicenseCheckerCallback = new MyLicenseCheckerCallback();
-
-        // Construct the LicenseChecker with a Policy.
-        mChecker = new LicenseChecker(
-            this, new ServerManagedPolicy(this,
-                new AESObfuscator(SALT, getPackageName(), License.getID(this))),
-            BASE64_PUBLIC_KEY 
-            );
-        licenseCheck();
 		mAdapter = new MyAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mAdapter);
-
 		Button button = (Button) findViewById(R.id.smbFragment);
 		button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -160,8 +121,63 @@ public class Go extends FragmentActivity {
 			}
 		});
 		StrictMode.ThreadPolicy policy = new
-			StrictMode.ThreadPolicy.Builder().permitAll().build();
+				StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
+	}
+	
+	public void licenseCheck() {
+		mChecker.checkAccess(mLicenseCheckerCallback);
+	}
+	
+	public void licenseFail() {
+				Toast.makeText(getApplicationContext(),
+						"License check failed!", Toast.LENGTH_LONG).show();
+		new Thread((new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(3000);
+				}
+				catch (Exception e) {};
+				finish();
+			}
+		})).start();
+	}
+
+	private void setStatus(final String msg, long sleep) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				TextView s = (TextView) findViewById(R.id.tv_status);
+				s.setText(msg);
+			}
+		});
+		if (sleep > 0) {
+			try {
+				Thread.sleep(sleep);
+			} catch (Exception e) {}
+		}
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.streaming);
+		setStatus("Please wait! Checking license...", 500);
+		mHandler = new Handler();
+		// Construct the LicenseCheckerCallback. The library calls this when done.
+        mLicenseCheckerCallback = new MyLicenseCheckerCallback();
+
+        // Construct the LicenseChecker with a Policy.
+        mChecker = new LicenseChecker(
+            this, new ServerManagedPolicy(this,
+                new AESObfuscator(SALT, getPackageName(), License.getID(this))),
+            BASE64_PUBLIC_KEY 
+            );
+        licenseCheck();
+
 	}
 
 	public static class MyAdapter extends FragmentPagerAdapter {
