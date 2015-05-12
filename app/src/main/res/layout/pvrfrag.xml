@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/TableLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView1"
+        android:fillViewport="true"
+        android:layoutMode="opticalBounds"
+        android:measureAllChildren="true"
+        android:nestedScrollingEnabled="true">
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        android:fillViewport="true"
+        android:layoutMode="opticalBounds"
+        android:measureAllChildren="true"
+        android:nestedScrollingEnabled="true">
+
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 	
     <TableRow
         android:id="@+id/tableRow1"
@@ -23,12 +44,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/pvrText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PVR Player"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Choose"
+                android:id="@+id/bt_pvrplayer"
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/pvrText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PVR Player"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </TableRow>
+
     </TableRow>
 
     <TableRow
@@ -36,19 +70,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Choose"
-            android:id="@+id/bt_pvrplayer"
-            android:layout_column="0" />
-
         <EditText
             android:id="@+id/pvr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="com.mxtech.videoplayer.ad"
-            android:layout_column="1">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="com.mxtech.videoplayer.ad">
 
             <requestFocus />
         </EditText>
@@ -58,13 +84,13 @@
         android:id="@+id/tableRow2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
-
         <TextView
             android:id="@+id/TextView07"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="PVR Mapping"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+
     </TableRow>
 
     <TableRow
@@ -81,32 +107,31 @@
             android:width="250dp"
             android:hint="xbmcid,tvheadendid;xbmcid,tvheadendid;" />
 
-        <Button
-            android:id="@+id/bt_backend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:layout_column="1" />
-    </TableRow>
-
-    <TableRow
-        android:id="@+id/tableRow3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
     </TableRow>
     
    <TableRow
         android:id="@+id/tableRowPVRHost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
-      
-        <TextView
-            android:id="@+id/TextView08"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Host"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+       <TableRow
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+
+           <TextView
+               android:id="@+id/TextView08"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Host"
+               android:textAppearance="?android:attr/textAppearanceLarge" />
+
+           <Button
+               android:id="@+id/bt_backend"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Button" />
+       </TableRow>
+
     </TableRow>
 
     <TableRow
@@ -116,8 +141,8 @@
 
         <EditText
             android:id="@+id/tvh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="localhost" />
     </TableRow>
     
@@ -142,8 +167,8 @@
 
         <EditText
             android:id="@+id/excludePvr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="1,2" />
     </TableRow>
 
@@ -161,3 +186,6 @@
     </TableRow>
 
 </TableLayout>
+        </HorizontalScrollView>
+    </ScrollView>
+    </TableLayout>
