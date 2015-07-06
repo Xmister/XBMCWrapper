@@ -96,8 +96,8 @@ public class OtherFragment extends Fragment {
 				mainIntent.setType("video/*");
 				//mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 				final List<ResolveInfo> pkgAppsList = getActivity().getPackageManager().queryIntentActivities(mainIntent, 0);
-				items = new String[pkgAppsList.size()-1];
-				String[] names = new String[pkgAppsList.size()-1];
+				items = new String[pkgAppsList.size()];
+				String[] names = new String[pkgAppsList.size()];
 				int i=0;
 				for (ResolveInfo ri : pkgAppsList) {
 					if ( !ri.activityInfo.packageName.equals(getActivity().getPackageName())) {
@@ -105,6 +105,8 @@ public class OtherFragment extends Fragment {
 						names[i++] = ri.loadLabel(getActivity().getPackageManager()).toString();
 					}
 				}
+				items[i] = "system";
+				names[i++] = "Choose by system";
 				ChoiceDialog md = new ChoiceDialog("Choose a Player", names, fdi, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "fileplayer");
 			}
@@ -117,8 +119,8 @@ public class OtherFragment extends Fragment {
 				mainIntent.setType("video/*");
 				//mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 				final List<ResolveInfo> pkgAppsList = getActivity().getPackageManager().queryIntentActivities(mainIntent, 0);
-				items = new String[pkgAppsList.size()-1];
-				String[] names = new String[pkgAppsList.size()-1];
+				items = new String[pkgAppsList.size()];
+				String[] names = new String[pkgAppsList.size()];
 				int i=0;
 				for (ResolveInfo ri : pkgAppsList) {
 					if ( !ri.activityInfo.packageName.equals(getActivity().getPackageName())) {
@@ -126,6 +128,8 @@ public class OtherFragment extends Fragment {
 						names[i++] = ri.loadLabel(getActivity().getPackageManager()).toString();
 					}
 				}
+				items[i] = "system";
+				names[i++] = "Choose by system";
 				ChoiceDialog md = new ChoiceDialog("Choose a Player", names, hdi, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "httpplayer");
 			}

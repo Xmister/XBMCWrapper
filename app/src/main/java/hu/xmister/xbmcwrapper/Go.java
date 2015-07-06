@@ -1,5 +1,8 @@
 package hu.xmister.xbmcwrapper;
 
+import android.app.Application;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;

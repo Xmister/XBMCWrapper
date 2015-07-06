@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -91,6 +92,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 		((CheckBox) getActivity().findViewById(R.id.ch_update)).setChecked(sharedPreferences
 				.getBoolean("ch_update",
 						((CheckBox) getActivity().findViewById(R.id.ch_update)).isChecked()));
+		if (sharedPreferences.getInt("theme",0) == 0) ((RadioButton) getActivity().findViewById(R.id.rb_white)).setChecked(true);
+		else ((RadioButton) getActivity().findViewById(R.id.rb_black)).setChecked(true);
 	}
 
 	private void saveXML() {
@@ -110,9 +113,14 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 			OutputStream os;
 			try {
-				os = new FileOutputStream(
-						Environment.getExternalStorageDirectory().getPath()
-								+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
+				String fileName=Environment.getExternalStorageDirectory().getPath()
+						+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml";
+				File f = new File(fileName);
+				if (f.exists()) {
+					File fOld = new File(fileName+".old."+System.currentTimeMillis()/1000);
+					f.renameTo(fOld);
+				}
+				os = new FileOutputStream(fileName);
 				byte[] buffer = new byte[(int) length];
 				is.read(buffer);
 				is.close();
@@ -241,6 +249,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 				editor.putBoolean("ch_update",
 						((CheckBox) getActivity().findViewById(R.id.ch_update))
 								.isChecked());
+				editor.putInt("theme",
+						(((RadioButton)getActivity().findViewById(R.id.rb_white)).isChecked() ? 0 : 1));
 				editor.commit();
 				if (sharedPreferences
 						.getBoolean("ch_update",
