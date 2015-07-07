@@ -237,7 +237,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		saveXML();
-		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password, and choose your favorite player!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and polay it through MX Player Free (if installed).");
+		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password, and choose your favorite player!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and will let android choose your player every time.");
 	}
 
 	public void save() {
