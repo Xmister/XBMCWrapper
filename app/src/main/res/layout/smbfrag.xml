@@ -64,7 +64,7 @@
             android:id="@+id/samba"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="com.mxtech.videoplayer.ad"
+            android:text="system"
             android:layout_span="2" />
     </TableRow>
     

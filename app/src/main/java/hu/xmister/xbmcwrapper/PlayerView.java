@@ -122,7 +122,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					if (FileSmb.startsWith("file://")) {
-						String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+						String pkg=sharedPreferences.getString("file", "system");
 						setStatus("Launching " + pkg + " with local file...");
 						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 						FileSmb = FileSmb.replaceFirst("(?i)file://", "");
@@ -139,7 +139,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				}
 				else if (FileSmb.startsWith("file://")) {
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+					String pkg=sharedPreferences.getString("file", "system");
 					setStatus("Launching " + pkg + " with local file...");
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 					FileSmb = FileSmb.replaceFirst("(?i)file://", "");
@@ -153,7 +153,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startHTTPStreaming("http",FileSmb);
 					}
 					else {
-						String pkg=sharedPreferences.getString("http", "com.mxtech.videoplayer.ad");
+						String pkg=sharedPreferences.getString("http", "system");
 						setStatus("Launching "+pkg+" with URL");
 						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
@@ -228,7 +228,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startHTTPStreaming("pvr",url);
 					}
 					else {
-						String pkg=sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad");
+						String pkg=sharedPreferences.getString("pvr", "system");
 						setStatus("Launching "+pkg+" with URL");
 						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
@@ -238,7 +238,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					
 				}
 				else  {
-					String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
+					String pkg=sharedPreferences.getString("file", "system");
 					setStatus("Launching " + pkg + " with URL");
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
@@ -453,7 +453,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		String mediaURL="http://10.0.1.4:8203/MediaItems/"+id+".mkv";
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("miniDLNA","Launch Player: "+mediaURL);
-		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		String pkg=sharedPreferences.getString("samba", "system");
 		setStatus("Launching "+pkg+" with miniDLNA...");
 		if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.parse(mediaURL), "video/*");
@@ -537,7 +537,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		}
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
-		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		String pkg=sharedPreferences.getString("samba", "system");
 		setStatus("Launching "+pkg+" with CIFS Mounted path...");
 		if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.fromFile(new File(MOUNT_PATH+File.separator+smbfile)), "video/*");
@@ -563,7 +563,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+			String pkg=sharedPreferences.getString("samba", "system");
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), "UTF-8")), "video/*");
@@ -577,7 +577,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			String pkg=sharedPreferences.getString(protocol, "com.mxtech.videoplayer.ad");
+			String pkg=sharedPreferences.getString(protocol, "system");
 			setStatus("Launching " +pkg+" with HTTP Re-Stream");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/video"+System.currentTimeMillis()+".mpeg"), "video/*");
@@ -617,13 +617,13 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						setStatus("Unmounting CIFS Shares...", 500);
 						//We should kill the players, otherwise unmounting is not possible
 						SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
-						String cmd = getBB() + "killall " + sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad") + "\n";
+						String cmd = getBB() + "killall " + sharedPreferences.getString("samba", "system") + "\n";
 						executeSu(cmd);
-						cmd = getBB() + "killall " + sharedPreferences.getString("http", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("http", "system") + "\n";
 						executeSu(cmd);
-						cmd = getBB() + "killall " + sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("pvr", "system") + "\n";
 						executeSu(cmd);
-						cmd = getBB() + "killall " + sharedPreferences.getString("file", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("file", "system") + "\n";
 						executeSu(cmd);
 						int i = 1;
 						//The file handlers may not be free right away
