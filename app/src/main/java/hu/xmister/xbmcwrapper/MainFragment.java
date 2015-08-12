@@ -195,6 +195,33 @@ public class MainFragment extends Fragment implements OnClickListener {
 				} else {
 					xml = xml.replace("!PVR!", "");
 				}
+				if (sharedPreferences.getBoolean("dav",true)) {
+					temp = new String("<rule protocols=\"dav\" player=\"XBMCWrapper\" >\n");
+					if (sharedPreferences.getInt("resolution", 1) != 0) {
+						for (int i = sharedPreferences.getInt("resolution", 1); i <= 3; i++) {
+							switch (i) {
+								case 1:
+									temp += "\t<rule video=\"true\" videoresolution=\"540\" player=\"XBMCWrapper\"/>\n";
+									temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+									break;
+								case 2:
+									temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\"/>\n";
+									temp += "\t<rule filename=\".*720.*\" player=\"XBMCWrapper\"/>\n";
+									break;
+								case 3:
+									temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\"/>\n";
+									temp += "\t<rule filename=\".*1080.*\" player=\"XBMCWrapper\"/>\n";
+									break;
+							}
+						}
+					}
+					temp +="</rule>\n";
+					xml = xml
+							.replace("!DAV!",
+									temp);
+				} else {
+					xml = xml.replace("!DAV!", "");
+				}
 				if (sharedPreferences.getBoolean("xmlvideo",true)) {
 					temp = new String("");
 					if (sharedPreferences.getInt("resolution", 1) != 0) {

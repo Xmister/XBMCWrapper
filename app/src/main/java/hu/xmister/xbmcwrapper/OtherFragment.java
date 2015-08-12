@@ -151,6 +151,9 @@ public class OtherFragment extends Fragment {
 		((CheckBox) getActivity().findViewById(R.id.ch_rehttp)).setChecked(sharedPreferences
 				.getBoolean("rehttp",
 						((CheckBox) getActivity().findViewById(R.id.ch_rehttp)).isChecked()));
+		((CheckBox) getActivity().findViewById(R.id.ch_dav)).setChecked(sharedPreferences
+				.getBoolean("dav",
+						((CheckBox) getActivity().findViewById(R.id.ch_dav)).isChecked()));
 		((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).setChecked(sharedPreferences
 				.getBoolean("xmlvideo",
 						((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo)).isChecked()));
@@ -218,6 +221,9 @@ public class OtherFragment extends Fragment {
 			editor.putBoolean("rehttp",
 					((CheckBox) getActivity().findViewById(R.id.ch_rehttp))
 							.isChecked());
+			editor.putBoolean("dav",
+						((CheckBox) getActivity().findViewById(R.id.ch_dav))
+								.isChecked());
 			editor.putBoolean("xmlvideo",
 					((CheckBox) getActivity().findViewById(R.id.ch_xmlVideo))
 							.isChecked());

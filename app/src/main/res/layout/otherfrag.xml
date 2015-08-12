@@ -124,6 +124,17 @@
                     android:checked="true"
                     android:text="Re-Stream HTTP" />
             </TableRow>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <CheckBox
+                    android:id="@+id/ch_dav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Handle WebDAV" />
+            </TableRow>
 
             <TableRow
                 android:id="@+id/otherTableRow9"

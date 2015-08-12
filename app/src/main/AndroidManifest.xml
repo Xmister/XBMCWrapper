@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="hu.xmister.xbmcwrapper"
-    android:versionCode="23"
+    android:versionCode="24"
     android:versionName="3.8.1" >
 
     <!-- Required permission to check licensing. -->
