@@ -149,6 +149,14 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 					LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
 					startActivityForResult(LaunchIntent,1);
 				}
+				else if (FileSmb.startsWith("dav://")) {
+					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					String pkg=sharedPreferences.getString("http", "system");
+					setStatus("Launching " + pkg + " with local file...");
+					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
+					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+					startActivityForResult(LaunchIntent, 1);
+				}
 				else if (FileSmb.startsWith("http://")) {
 					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
 					setStatus("Starting HTTP...",0);
