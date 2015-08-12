@@ -266,6 +266,10 @@ public class MainFragment extends Fragment implements OnClickListener {
 								.isChecked());
 				editor.putInt("theme",
 						(((RadioButton)getActivity().findViewById(R.id.rb_white)).isChecked() ? 0 : 1));
+				if (((RadioButton)getActivity().findViewById(R.id.rb_utf8)).isChecked()) editor.putInt("charset",0);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16)).isChecked()) editor.putInt("charset",1);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16le)).isChecked()) editor.putInt("charset",2);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16be)).isChecked()) editor.putInt("charset",3);
 				editor.commit();
 				if (sharedPreferences
 						.getBoolean("ch_update",
@@ -277,10 +281,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 										if (PlayerC.isDirectory())
 											saveXML();
 				}
-				if (((RadioButton)getActivity().findViewById(R.id.rb_utf8)).isChecked()) editor.putInt("charset",0);
-				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16)).isChecked()) editor.putInt("charset",1);
-				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16le)).isChecked()) editor.putInt("charset",2);
-				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16be)).isChecked()) editor.putInt("charset",3);
 			} catch (Exception e) {}
 		}
 	}
