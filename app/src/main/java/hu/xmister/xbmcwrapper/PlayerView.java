@@ -420,6 +420,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				CHARSET="UTF-16BE";
 				break;
 		}
+
+		/*
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -429,7 +431,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();
+        licenseCheck();*/
+		licenseOK();
 		
 	}
 	
