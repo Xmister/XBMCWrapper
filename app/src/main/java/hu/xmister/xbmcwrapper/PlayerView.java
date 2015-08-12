@@ -23,18 +23,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayerView extends android.support.v4.app.FragmentActivity {
 	private String FileSmb="";
 	private StreamOverHttp Serv=null;
-	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox"};
+	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox", ""};
 	private int BB_BINARY=0;
 	private String MOUNT_PATH=null;
 	private boolean chosen = false;
@@ -43,6 +46,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
     private LicenseChecker mChecker;
     private static final String BASE64_PUBLIC_KEY = License.getKey();
     private static final byte[] SALT = License.getSalt();
+	private String CHARSET;
     public int retryCount=0;
 	private boolean cleaning=false;
     
@@ -105,6 +109,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	}
     
     public void licenseOK() {
+		SharedPreferences se = getSharedPreferences("default",0);
     		new Thread((new Runnable() {
 			
 			@Override
@@ -119,12 +124,12 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					if (FileSmb.startsWith("file://")) {
-						String pkg=sharedPreferences.getString("file", "com.mxtech.videoplayer.ad");
-						setStatus("Launching "+pkg+" with local file...");
-						LaunchIntent.setPackage(pkg);
+						String pkg=sharedPreferences.getString("file", "system");
+						setStatus("Launching " + pkg + " with local file...");
+						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 						FileSmb = FileSmb.replaceFirst("(?i)file://", "");
 						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
-						startActivityForResult(LaunchIntent,1);
+						startActivityForResult(LaunchIntent, 1);
 					}
 					else {
 						if ( sharedPreferences.getInt("method", 3) == 3 ) {
@@ -134,6 +139,15 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						else di.onClick(null, sharedPreferences.getInt("method", 2));
 					}
 				}
+				else if (FileSmb.startsWith("file://")) {
+					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+					String pkg=sharedPreferences.getString("file", "system");
+					setStatus("Launching " + pkg + " with local file...");
+					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
+					FileSmb = FileSmb.replaceFirst("(?i)file://", "");
+					LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
+					startActivityForResult(LaunchIntent,1);
+				}
 				else if (FileSmb.startsWith("http://")) {
 					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
 					setStatus("Starting HTTP...",0);
@@ -141,10 +155,10 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startHTTPStreaming("http",FileSmb);
 					}
 					else {
-						String pkg=sharedPreferences.getString("http", "com.mxtech.videoplayer.ad");
+						String pkg=sharedPreferences.getString("http", "system");
 						setStatus("Launching "+pkg+" with URL");
 						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-						LaunchIntent.setPackage(pkg);
+						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 						LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
 						startActivityForResult(LaunchIntent,1);
 					}
@@ -216,36 +230,22 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startHTTPStreaming("pvr",url);
 					}
 					else {
-						String pkg=sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad");
+						String pkg=sharedPreferences.getString("pvr", "system");
 						setStatus("Launching "+pkg+" with URL");
 						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-						LaunchIntent.setPackage(pkg);
+						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 						LaunchIntent.setDataAndType(Uri.parse(url), "video/*");
 						startActivityForResult(LaunchIntent,1);
 					}
 					
 				}
 				else  {
-					Log.d("PlayerView","Redirecting protocol -"+FileSmb+"-");	
+					String pkg=sharedPreferences.getString("file", "system");
+					setStatus("Launching " + pkg + " with URL");
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					
-					if (FileSmb.startsWith("/")) {
-						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)),"video/*");
-					} else {
-						// Youtube
-						if (FileSmb.contains("youtube.com") && FileSmb.startsWith("http://")) {
-							Log.d("Open youtube","Yes");
-							String[] Ur=FileSmb.split(" ");
-							if (Ur.length>1) {
-								Log.d("Open youtube",Ur[0]);
-								LaunchIntent.setDataAndType(Uri.parse(Ur[0]),"video/*");
-							}
-						} else
-							LaunchIntent.setDataAndType(Uri.parse(FileSmb),"video/*");
-					}
-					startActivityForResult(LaunchIntent,1);
-					finish();
-					return;
+					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
+					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+					startActivityForResult(LaunchIntent, 1);
 				}
 				
 			}
@@ -387,19 +387,39 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.streaming);
+		SharedPreferences se = getSharedPreferences("default",0);
+		if ( se.getInt("theme",0) == 0) {
+
+		}
+		else {
+			((LinearLayout)findViewById(R.id.LinearLayout1)).setBackgroundColor(Color.BLACK);
+			((TextView)findViewById(R.id.tv_status)).setTextColor(Color.WHITE);
+		}
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		mHandler = new Handler();
 		Uri extras = getIntent().getData();
-		Log.d("smbwrapper","Launch");
+		Log.d("smbwrapper", "Launch");
 		findBB();
 		if (extras != null) {
 			FileSmb = extras.toString();
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
-		setContentView(R.layout.streaming);
-		
-		/*
+		switch ( se.getInt("charset",0) ) {
+			case 0:
+				CHARSET="UTF-8";
+				break;
+			case 1:
+				CHARSET="UTF-16";
+				break;
+			case 2:
+				CHARSET="UTF-16LE";
+				break;
+			case 3:
+				CHARSET="UTF-16BE";
+				break;
+		}
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -409,8 +429,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();*/
-		licenseOK();
+        licenseCheck();
 		
 	}
 	
@@ -450,28 +469,30 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		String mediaURL="http://10.0.1.4:8203/MediaItems/"+id+".mkv";
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("miniDLNA","Launch Player: "+mediaURL);
-		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		String pkg=sharedPreferences.getString("samba", "system");
 		setStatus("Launching "+pkg+" with miniDLNA...");
-		LaunchIntent.setPackage(pkg);
+		if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.parse(mediaURL), "video/*");
 		startActivityForResult(LaunchIntent,1);
+	}
+
+	private String getBB() {
+		if (BB_BINARIES[BB_BINARY].isEmpty()) return "";
+		else return BB_BINARIES[BB_BINARY]+" ";
+	}
+
+	private String parseCommand(String cmd, String smbpath) {
+		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
+		return cmd.replaceAll("(?i)%smbuser%",sharedPreferences.getString("smbuser",""))
+				.replaceAll("(?i)%smbpass%", sharedPreferences.getString("smbpass", ""))
+				.replaceAll("(?i)%smbpath%", smbpath)
+				.replaceAll("(?i)%mount_path%", sharedPreferences.getString("cifs", "/mnt/xbmcwrapper"));
 	}
 	
 	private void cifsMountPlay(final String FileSmb) throws Exception {
 		setStatus("Trying CIFS Mount...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
-		// Perform su to get root privileges
-		String cmd=BB_BINARIES[BB_BINARY]+" mount -o remount,rw /\n";
-		executeSu(cmd);
-		cmd=BB_BINARIES[BB_BINARY]+" mkdir -p "+MOUNT_PATH+"\n";
-		executeSu(cmd);
-		cmd=BB_BINARIES[BB_BINARY]+" chmod 777 "+MOUNT_PATH+"\n";
-		executeSu(cmd);
-		cmd=BB_BINARIES[BB_BINARY]+" umount "+MOUNT_PATH+"\n";
-		executeSu(cmd); //Just to make sure there is no stuck mount.
-		cmd=BB_BINARIES[BB_BINARY]+" mount -o remount,ro /\n";
-		executeSu(cmd);
 		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
@@ -479,30 +500,66 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 		String smbuser=sharedPreferences.getString("smbuser","");
 		String smbpass=sharedPreferences.getString("smbpass","");
 		ArrayList<String> commands = new ArrayList<String>();
-		if ( !smbuser.equals("") ) {
-			commands.add("mount -t cifs -o username="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o username="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o user="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o user="+smbuser+(!smbpass.equals("") ? ",password="+smbpass : "" )+",ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+		String cmd=null;
+		if (sharedPreferences.getBoolean("cb_mount",false)) {
+			StringTokenizer st = new StringTokenizer(sharedPreferences.getString("tb_mount",""),";");
+			while (st.hasMoreTokens()) {
+				commands.add(parseCommand(st.nextToken(), smbpath.substring(0, smbpath.indexOf(smbfile) - 1)));
+			}
+			int i=0,res=0;
+			do {
+				cmd=getBB()+commands.get(i++)+"\n";
+				if (sharedPreferences.getBoolean("cb_debug",false))
+					setStatus(cmd,5000);
+				Log.d("Mounting CIFS", cmd);
+				res=executeSu(cmd);
+				Log.d("Result code", ""+res);
+			} while (i<commands.size());
+			if (res != 0) throw new Exception("Unable to mount"); //Give up
 		}
 		else {
-			commands.add("mount -t cifs -o username=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o username=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o user=guest,ro,iocharset=utf8 "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
-			commands.add("mount -t cifs -o user=guest,ro "+smbpath.substring(0, smbpath.indexOf(smbfile)-1)+" "+MOUNT_PATH);
+			// Perform su to get root privileges
+			cmd=getBB()+"mount -o remount,rw /\n";
+			executeSu(cmd);
+			cmd=getBB()+"mkdir -p "+MOUNT_PATH+"\n";
+			executeSu(cmd);
+			cmd=getBB()+"chmod 777 "+MOUNT_PATH+"\n";
+			executeSu(cmd);
+			cmd=getBB()+"umount "+MOUNT_PATH+"\n";
+			executeSu(cmd); //Just to make sure there is no stuck mount.
+			cmd=getBB()+"mount -o remount,ro /\n";
+			executeSu(cmd);
+			if (!smbuser.equals("")) {
+				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+			} else {
+				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o username=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=guest,ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=guest,ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+			}
+			int i=0,res=0;
+			do {
+				cmd=getBB()+commands.get(i++)+"\n";
+				if (sharedPreferences.getBoolean("cb_mount",false)) {
+					setStatus(cmd,1000);
+				}
+				Log.d("Mounting CIFS", cmd);
+				res=executeSu(cmd);
+			} while ( res!= 0 && i<commands.size());
+			if (res != 0) throw new Exception("Unable to mount"); //Give up
 		}
-		int i=0,res=0;
-		do {
-			cmd=BB_BINARIES[BB_BINARY]+" "+commands.get(i++)+"\n";
-			Log.d("Mounting CIFS", cmd);
-			res=executeSu(cmd);
-		} while ( res!= 0 && i<commands.size());
-		if (res != 0) throw new Exception("Unable to mount"); //Give up
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
-		String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
+		String pkg=sharedPreferences.getString("samba", "system");
 		setStatus("Launching "+pkg+" with CIFS Mounted path...");
-		LaunchIntent.setPackage(pkg);
+		if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.fromFile(new File(MOUNT_PATH+File.separator+smbfile)), "video/*");
 				startActivityForResult(LaunchIntent,25);
 	}
@@ -526,10 +583,10 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			String pkg=sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad");
-			setStatus("Launching "+pkg+" with HTTP Stream from Samba...");
-			LaunchIntent.setPackage(pkg);
-			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), "UTF-8")), "video/*");
+			String pkg=sharedPreferences.getString("samba", "system");
+			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
+			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
+			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), CHARSET)), "video/*");
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {
@@ -540,9 +597,9 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			try {
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
-			String pkg=sharedPreferences.getString(protocol, "com.mxtech.videoplayer.ad");
-			setStatus("Launching "+pkg+" with HTTP Re-Stream");
-			LaunchIntent.setPackage(pkg);
+			String pkg=sharedPreferences.getString(protocol, "system");
+			setStatus("Launching " +pkg+" with HTTP Re-Stream");
+			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/video"+System.currentTimeMillis()+".mpeg"), "video/*");
 		}
 		startActivityForResult(LaunchIntent, 1);
@@ -580,19 +637,19 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						setStatus("Unmounting CIFS Shares...", 500);
 						//We should kill the players, otherwise unmounting is not possible
 						SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
-						String cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("samba", "com.mxtech.videoplayer.ad") + "\n";
+						String cmd = getBB() + "killall " + sharedPreferences.getString("samba", "system") + "\n";
 						executeSu(cmd);
-						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("http", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("http", "system") + "\n";
 						executeSu(cmd);
-						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("pvr", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("pvr", "system") + "\n";
 						executeSu(cmd);
-						cmd = BB_BINARIES[BB_BINARY] + " killall " + sharedPreferences.getString("file", "com.mxtech.videoplayer.ad") + "\n";
+						cmd = getBB() + "killall " + sharedPreferences.getString("file", "system") + "\n";
 						executeSu(cmd);
 						int i = 1;
 						//The file handlers may not be free right away
 						for (i = 1; i <= 10; i++) {
 							try {
-								cmd = BB_BINARIES[BB_BINARY] + " umount " + MOUNT_PATH + "\n";
+								cmd = getBB() + "umount " + MOUNT_PATH + "\n";
 								Log.d("UnMounting CIFS", cmd);
 								int r = executeSu(cmd);
 								Log.d("UnMount Result", "" + r);

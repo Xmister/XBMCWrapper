@@ -64,7 +64,7 @@
                     android:id="@+id/file"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="com.mxtech.videoplayer.ad" >
+                    android:text="system" >
 
                     <requestFocus />
                 </EditText>
@@ -109,7 +109,7 @@
                     android:id="@+id/http"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="com.mxtech.videoplayer.ad" />
+                    android:text="system" />
             </TableRow>
 
             <TableRow

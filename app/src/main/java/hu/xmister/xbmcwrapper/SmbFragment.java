@@ -3,8 +3,10 @@ package hu.xmister.xbmcwrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.widget.ScrollView;
+import android.widget.TableRow;
 
 import java.util.List;
 
@@ -107,8 +111,8 @@ public class SmbFragment extends Fragment {
 				mainIntent.setType("video/*");
 				//mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 				final List<ResolveInfo> pkgAppsList = getActivity().getPackageManager().queryIntentActivities(mainIntent, 0);
-				items = new String[pkgAppsList.size()-1];
-				String[] names = new String[pkgAppsList.size()-1];
+				items = new String[pkgAppsList.size()];
+				String[] names = new String[pkgAppsList.size()];
 				int i=0;
 				for (ResolveInfo ri : pkgAppsList) {
 					if ( !ri.activityInfo.packageName.equals(getActivity().getPackageName())) {
@@ -116,6 +120,8 @@ public class SmbFragment extends Fragment {
 						names[i++] = ri.loadLabel(getActivity().getPackageManager()).toString();
 					}
 				}
+				items[i] = "system";
+				names[i++] = "Choose by system";
 				ChoiceDialog md = new ChoiceDialog("Choose a Player", names, sdi, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "smbplayer");
 			}
@@ -125,14 +131,41 @@ public class SmbFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				ChoiceDialog md = new ChoiceDialog("Choose a method",new String[] { "MiniDLNA",
-						"CIFS", "HTTP", "Ask" }, di, dc, dd);
+				ChoiceDialog md = new ChoiceDialog("Choose a method", new String[]{"MiniDLNA",
+						"CIFS", "HTTP", "Ask"}, di, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "method");
 			}
 		});
-		((EditText) getActivity().findViewById(R.id.samba)).setText(sharedPreferences
-				.getString("samba", ((EditText) getActivity().findViewById(R.id.samba))
-						.getText().toString()));
+		final CheckBox cb_mount = (CheckBox) getActivity().findViewById(R.id.cb_mount);
+		OnClickListener cb_mount_listener=new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (cb_mount.isChecked()) {
+					((TableRow) getActivity().findViewById(R.id.tr_mount)).setVisibility(View.VISIBLE);
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(100);
+								getActivity().runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										((ScrollView) getActivity().findViewById(R.id.scrollView1)).fullScroll(View.FOCUS_DOWN);
+									}
+								});
+							} catch ( Exception e) {}
+						}
+					}).start();
+
+				} else {
+					((TableRow) getActivity().findViewById(R.id.tr_mount)).setVisibility(View.GONE);
+				}
+			}
+		};
+		cb_mount.setOnClickListener(cb_mount_listener);
+				((EditText) getActivity().findViewById(R.id.samba)).setText(sharedPreferences
+						.getString("samba", ((EditText) getActivity().findViewById(R.id.samba))
+								.getText().toString()));
 		((EditText) getActivity().findViewById(R.id.rfrom)).setText(sharedPreferences
 				.getString("rfrom", ((EditText) getActivity().findViewById(R.id.rfrom))
 						.getText().toString()));
@@ -151,6 +184,12 @@ public class SmbFragment extends Fragment {
 		((CheckBox) getActivity().findViewById(R.id.r2)).setChecked(sharedPreferences
 				.getBoolean("r2",
 						((CheckBox) getActivity().findViewById(R.id.r2)).isChecked()));
+		((CheckBox) getActivity().findViewById(R.id.cb_mount)).setChecked(sharedPreferences
+				.getBoolean("cb_mount",
+						((CheckBox) getActivity().findViewById(R.id.cb_mount)).isChecked()));
+		((CheckBox) getActivity().findViewById(R.id.cb_debug)).setChecked(sharedPreferences
+				.getBoolean("cb_debug",
+						((CheckBox) getActivity().findViewById(R.id.cb_debug)).isChecked()));
 		((EditText) getActivity().findViewById(R.id.cifs)).setText(sharedPreferences
 				.getString("cifs", ((EditText) getActivity().findViewById(R.id.cifs))
 						.getText().toString()));
@@ -160,7 +199,11 @@ public class SmbFragment extends Fragment {
 		((EditText) getActivity().findViewById(R.id.smbpass)).setText(sharedPreferences
 				.getString("smbpass", ((EditText) getActivity().findViewById(R.id.smbpass))
 						.getText().toString()));
+		((EditText) getActivity().findViewById(R.id.tb_mount)).setText(sharedPreferences
+				.getString("tb_mount", ((EditText) getActivity().findViewById(R.id.tb_mount))
+						.getText().toString()));
 		di.onClick(null, sharedPreferences.getInt("method", 2));
+		cb_mount_listener.onClick(cb_mount);
 	}
 	
 	public void save() {
@@ -190,6 +233,12 @@ public class SmbFragment extends Fragment {
 			editor.putBoolean("r2",
 					((CheckBox) getActivity().findViewById(R.id.r2))
 							.isChecked());
+			editor.putBoolean("cb_mount",
+					((CheckBox) getActivity().findViewById(R.id.cb_mount))
+							.isChecked());
+			editor.putBoolean("cb_debug",
+					((CheckBox) getActivity().findViewById(R.id.cb_debug))
+							.isChecked());
 			editor.putString("cifs",
 					((EditText) getActivity().findViewById(R.id.cifs))
 							.getText().toString());
@@ -198,6 +247,9 @@ public class SmbFragment extends Fragment {
 							.getText().toString());
 			editor.putString("smbpass",
 					((EditText) getActivity().findViewById(R.id.smbpass))
+							.getText().toString());
+			editor.putString("tb_mount",
+					((EditText) getActivity().findViewById(R.id.tb_mount))
 							.getText().toString());
 			editor.putInt("method", (Integer) MetBt.getTag());
 			editor.commit();

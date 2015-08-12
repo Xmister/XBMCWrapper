@@ -1,5 +1,8 @@
 package hu.xmister.xbmcwrapper;
 
+import android.app.Application;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -167,7 +170,6 @@ public class Go extends FragmentActivity {
 		setContentView(R.layout.streaming);
 		setStatus("Please wait! Checking license...", 500);
 		mHandler = new Handler();
-		/*
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -177,8 +179,7 @@ public class Go extends FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();*/
-		licenseOK();
+        licenseCheck();
 
 	}
 

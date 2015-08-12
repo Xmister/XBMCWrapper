@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -91,6 +92,23 @@ public class MainFragment extends Fragment implements OnClickListener {
 		((CheckBox) getActivity().findViewById(R.id.ch_update)).setChecked(sharedPreferences
 				.getBoolean("ch_update",
 						((CheckBox) getActivity().findViewById(R.id.ch_update)).isChecked()));
+		if (sharedPreferences.getInt("theme",0) == 0) ((RadioButton) getActivity().findViewById(R.id.rb_white)).setChecked(true);
+		else ((RadioButton) getActivity().findViewById(R.id.rb_black)).setChecked(true);
+
+		switch (sharedPreferences.getInt("charset",0)) {
+			case 0:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf8)).setChecked(true);
+				break;
+			case 1:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16)).setChecked(true);
+				break;
+			case 2:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16le)).setChecked(true);
+				break;
+			case 3:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16be)).setChecked(true);
+				break;
+		}
 	}
 
 	private void saveXML() {
@@ -110,9 +128,14 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 			OutputStream os;
 			try {
-				os = new FileOutputStream(
-						Environment.getExternalStorageDirectory().getPath()
-								+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml");
+				String fileName=Environment.getExternalStorageDirectory().getPath()
+						+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml";
+				File f = new File(fileName);
+				if (f.exists()) {
+					File fOld = new File(fileName+".old."+System.currentTimeMillis()/1000);
+					f.renameTo(fOld);
+				}
+				os = new FileOutputStream(fileName);
 				byte[] buffer = new byte[(int) length];
 				is.read(buffer);
 				is.close();
@@ -229,7 +252,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		saveXML();
-		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password, and choose your favorite player!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and polay it through MX Player Free (if installed).");
+		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password, and choose your favorite player!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and will let android choose your player every time.");
 	}
 
 	public void save() {
@@ -241,6 +264,8 @@ public class MainFragment extends Fragment implements OnClickListener {
 				editor.putBoolean("ch_update",
 						((CheckBox) getActivity().findViewById(R.id.ch_update))
 								.isChecked());
+				editor.putInt("theme",
+						(((RadioButton)getActivity().findViewById(R.id.rb_white)).isChecked() ? 0 : 1));
 				editor.commit();
 				if (sharedPreferences
 						.getBoolean("ch_update",
@@ -252,6 +277,10 @@ public class MainFragment extends Fragment implements OnClickListener {
 										if (PlayerC.isDirectory())
 											saveXML();
 				}
+				if (((RadioButton)getActivity().findViewById(R.id.rb_utf8)).isChecked()) editor.putInt("charset",0);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16)).isChecked()) editor.putInt("charset",1);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16le)).isChecked()) editor.putInt("charset",2);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16be)).isChecked()) editor.putInt("charset",3);
 			} catch (Exception e) {}
 		}
 	}

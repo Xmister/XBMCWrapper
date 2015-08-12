@@ -74,7 +74,7 @@
             android:id="@+id/pvr"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="com.mxtech.videoplayer.ad">
+            android:text="system">
 
             <requestFocus />
         </EditText>
