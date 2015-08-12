@@ -133,7 +133,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startActivityForResult(LaunchIntent, 1);
 					}
 					else {
-						if ( sharedPreferences.getInt("method", 3) == 3 ) {
+						if ( sharedPreferences.getInt("method", 2) == 3 ) {
 							ChoiceDialog md = new ChoiceDialog("Choose Streaming Method",new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
 							md.show(getSupportFragmentManager(),"method");
 						}
