@@ -186,6 +186,7 @@
                 <data android:scheme="mmsh" />
                 <data android:scheme="http" />
                 <data android:scheme="pvr" />
+                <data android:scheme="dav" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -197,6 +198,7 @@
                 <data android:scheme="gopher" />
                 <data android:scheme="http" />
                 <data android:scheme="pvr" />
+                <data android:scheme="dav" />
                 <data android:mimeType="video/*" />
                 <data android:mimeType="*/rmvb" />
                 <data android:mimeType="*/avi" />
