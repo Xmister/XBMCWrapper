@@ -152,8 +152,9 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				else if (FileSmb.startsWith("dav://")) {
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					String pkg=sharedPreferences.getString("http", "system");
-					setStatus("Launching " + pkg + " with local file...");
+					setStatus("Launching " + pkg + " with local DAV->HTTP URL...");
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
+					FileSmb = FileSmb.replaceFirst("(?i)dav://", "http://");
 					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
 					startActivityForResult(LaunchIntent, 1);
 				}
@@ -436,7 +437,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
         mChecker = new LicenseChecker(
             this, new ServerManagedPolicy(this,
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
-            BASE64_PUBLIC_KEY 
+				BASE64_PUBLIC_KEY
             );
         licenseCheck();
 		
