@@ -133,7 +133,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						startActivityForResult(LaunchIntent, 1);
 					}
 					else {
-						if ( sharedPreferences.getInt("method", 3) == 3 ) {
+						if ( sharedPreferences.getInt("method", 2) == 3 ) {
 							ChoiceDialog md = new ChoiceDialog("Choose Streaming Method",new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
 							md.show(getSupportFragmentManager(),"method");
 						}
@@ -588,7 +588,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 			try {
-				LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:" + Serv.getPort() + "/" + URLEncoder.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), CHARSET)), "video/*");
+				LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:" + Serv.getPort() + "/" + FileSmb.substring(6)), "video/*");
 			} catch (Exception e) {
 				Log.e("urlencode",e.getMessage());
 			}
