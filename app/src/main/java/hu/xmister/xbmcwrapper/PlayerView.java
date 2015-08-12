@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
     private LicenseChecker mChecker;
     private static final String BASE64_PUBLIC_KEY = License.getKey();
     private static final byte[] SALT = License.getSalt();
+	private String CHARSET;
     public int retryCount=0;
 	private boolean cleaning=false;
     
@@ -385,6 +387,15 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.streaming);
+		SharedPreferences se = getSharedPreferences("default",0);
+		if ( se.getInt("theme",0) == 0) {
+
+		}
+		else {
+			((LinearLayout)findViewById(R.id.LinearLayout1)).setBackgroundColor(Color.BLACK);
+			((TextView)findViewById(R.id.tv_status)).setTextColor(Color.WHITE);
+		}
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 		mHandler = new Handler();
@@ -395,14 +406,19 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			FileSmb = extras.toString();
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
-		setContentView(R.layout.streaming);
-		SharedPreferences se = getSharedPreferences("default",0);
-		if ( se.getInt("theme",0) == 0) {
-
-		}
-		else {
-			((LinearLayout)findViewById(R.id.LinearLayout1)).setBackgroundColor(Color.BLACK);
-			((TextView)findViewById(R.id.tv_status)).setTextColor(Color.WHITE);
+		switch ( se.getInt("charset",0) ) {
+			case 0:
+				CHARSET="UTF-8";
+				break;
+			case 1:
+				CHARSET="UTF-16";
+				break;
+			case 2:
+				CHARSET="UTF-16LE";
+				break;
+			case 3:
+				CHARSET="UTF-16BE";
+				break;
 		}
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
@@ -514,13 +530,17 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			cmd=getBB()+"mount -o remount,ro /\n";
 			executeSu(cmd);
 			if (!smbuser.equals("")) {
+				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 			} else {
+				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
+				commands.add("mount -t cifs -o user=guest,ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o user=guest,ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o user=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 			}
@@ -566,7 +586,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			String pkg=sharedPreferences.getString("samba", "system");
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), "UTF-8")), "video/*");
+			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), CHARSET)), "video/*");
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {

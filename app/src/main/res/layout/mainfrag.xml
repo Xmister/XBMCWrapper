@@ -83,5 +83,53 @@
                 android:checked="false" />
         </RadioGroup>
     </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Charset:"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+    </TableRow>
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UTF-8"
+                android:id="@+id/rb_utf8"
+                android:checked="true" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UTF-16"
+                android:id="@+id/rb_utf16"
+                android:checked="false" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UTF-16LE"
+                android:id="@+id/rb_utf16le"
+                android:checked="false" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UTF-16BE"
+                android:id="@+id/rb_utf16be"
+                android:checked="false" />
+        </RadioGroup>
+    </TableRow>
 
 </TableLayout>

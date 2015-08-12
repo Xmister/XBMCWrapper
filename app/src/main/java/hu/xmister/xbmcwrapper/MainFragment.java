@@ -94,6 +94,21 @@ public class MainFragment extends Fragment implements OnClickListener {
 						((CheckBox) getActivity().findViewById(R.id.ch_update)).isChecked()));
 		if (sharedPreferences.getInt("theme",0) == 0) ((RadioButton) getActivity().findViewById(R.id.rb_white)).setChecked(true);
 		else ((RadioButton) getActivity().findViewById(R.id.rb_black)).setChecked(true);
+
+		switch (sharedPreferences.getInt("charset",0)) {
+			case 0:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf8)).setChecked(true);
+				break;
+			case 1:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16)).setChecked(true);
+				break;
+			case 2:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16le)).setChecked(true);
+				break;
+			case 3:
+				((RadioButton) getActivity().findViewById(R.id.rb_utf16be)).setChecked(true);
+				break;
+		}
 	}
 
 	private void saveXML() {
@@ -262,6 +277,10 @@ public class MainFragment extends Fragment implements OnClickListener {
 										if (PlayerC.isDirectory())
 											saveXML();
 				}
+				if (((RadioButton)getActivity().findViewById(R.id.rb_utf8)).isChecked()) editor.putInt("charset",0);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16)).isChecked()) editor.putInt("charset",1);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16le)).isChecked()) editor.putInt("charset",2);
+				else if (((RadioButton)getActivity().findViewById(R.id.rb_utf16be)).isChecked()) editor.putInt("charset",3);
 			} catch (Exception e) {}
 		}
 	}
