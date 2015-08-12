@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView1"
+        android:fillViewport="true"
+        android:layoutMode="opticalBounds"
+        android:measureAllChildren="true"
+        android:nestedScrollingEnabled="true">
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollView"
+            android:fillViewport="true"
+            android:layoutMode="opticalBounds"
+            android:measureAllChildren="true"
+            android:nestedScrollingEnabled="true">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -132,4 +153,7 @@
         </RadioGroup>
     </TableRow>
 
+</TableLayout>
+        </HorizontalScrollView>
+    </ScrollView>
 </TableLayout>
