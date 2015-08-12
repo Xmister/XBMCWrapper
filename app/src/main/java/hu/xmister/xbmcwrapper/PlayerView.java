@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -586,7 +587,11 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 			String pkg=sharedPreferences.getString("samba", "system");
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-			LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:"+Serv.getPort()+"/"+Uri.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), CHARSET)), "video/*");
+			try {
+				LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:" + Serv.getPort() + "/" + URLEncoder.encode(FileSmb.substring(6).replaceAll("\\+", "%20"), CHARSET)), "video/*");
+			} catch (Exception e) {
+				Log.e("urlencode",e.getMessage());
+			}
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {
