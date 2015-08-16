@@ -152,7 +152,7 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 				else if (FileSmb.startsWith("dav://")) {
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					String pkg=sharedPreferences.getString("http", "system");
-					setStatus("Launching " + pkg + " with DAV->HTTP URL...");
+					setStatus("Launching " + pkg + " with local DAV->HTTP URL...");
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 					FileSmb = FileSmb.replaceFirst("(?i)dav://", "http://");
 					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
