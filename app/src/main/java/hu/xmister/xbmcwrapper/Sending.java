@@ -57,9 +57,7 @@ public class Sending extends Thread {
 	   }
 	
 	 private void StartReceive() {
-	   
-	   
-	   // Recup�re la r�ponse
+         
 	
 	   try{
          inS = _Socket.getInputStream();
@@ -212,8 +210,7 @@ public class Sending extends Thread {
          }
         
          String URI = st.nextToken();
-         
-         // Trouve le fichier
+
          URI=URI.substring(1);
          
          if (_Del.getProtocol().equals("smb")) {
@@ -281,18 +278,18 @@ private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf,
      	//Log.d("copyStream","Read");
 			count = in.read(tmpBuf, 0, count);
 		} catch (Exception e) {
-			Log.d("copyStream","Echec lecture "+e.getMessage());
+			Log.d("copyStream","Error "+e.getMessage());
 			return;
 		}
      if(count<0) {
-     	Log.d("copyStream","Fin du flux");
+     	Log.d("copyStream","Finished");
         break;
      }
      try {
      	//Log.d("copyStream","Write");
 			out.write(tmpBuf, 0, count);
 		} catch (Exception e) {
-			Log.d("copyStream","Echec ecriture "+e.getMessage());
+			Log.d("copyStream","Error "+e.getMessage());
 			return;
 		}
      
