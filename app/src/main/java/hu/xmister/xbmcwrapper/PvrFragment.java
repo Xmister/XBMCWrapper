@@ -44,6 +44,9 @@ public class PvrFragment extends Fragment {
 			case 2:
 				PVRBt.setText("DVBViewer");
 				break;
+			case 3:
+				PVRBt.setText("NextPVR");
+				break;
 			case 0:
 			default:
 				PVRBt.setText("Disabled");
@@ -127,7 +130,7 @@ public class PvrFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				ChoiceDialog md = new ChoiceDialog("Choose a backend",new String[] { "Disabled",
-						"TvHeadend", "DVBViewer" }, di, dc, dd);
+						"TvHeadend", "DVBViewer", "NextPVR" }, di, dc, dd);
 				md.show(getActivity().getSupportFragmentManager(), "backend");
 			}
 		});
