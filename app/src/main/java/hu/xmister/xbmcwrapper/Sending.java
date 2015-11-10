@@ -57,7 +57,7 @@ public class Sending extends Thread {
 	   }
 	
 	 private void StartReceive() {
-         
+
 	
 	   try{
          inS = _Socket.getInputStream();
