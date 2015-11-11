@@ -201,7 +201,8 @@ public class PlayerView extends android.support.v4.app.FragmentActivity {
 						while (st.hasMoreTokens()) {
 							String token=st.nextToken();
 							StringTokenizer sts=new StringTokenizer(token, ",");
-							if ( sts.nextToken().equals(String.valueOf((Integer.valueOf(id)+1))) ) {
+							//if ( sts.nextToken().equals(String.valueOf((Integer.valueOf(id)+1))) ) {
+							if ( sts.nextToken().equals(String.valueOf((Integer.valueOf(id)))) ) {
 								id=sts.nextToken();
 								break;
 							}
