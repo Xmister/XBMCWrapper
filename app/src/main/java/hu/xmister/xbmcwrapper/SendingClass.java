@@ -20,9 +20,9 @@ import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
 
-public class Sending extends Thread {
+public class SendingClass extends Thread {
 	   
-	   private StreamOverHttp _Del; 
+	   private StreamOverHttp httpStream;
 	   private String _fileMimeType;
 	   private long _FileSize;
 	   private SmbFileInputStream _SmbStream=null;
@@ -36,17 +36,17 @@ public class Sending extends Thread {
 	      HTTP_416 = "416 Range not satisfiable",
 	      HTTP_INTERNALERROR = "500 Internal Server Error",
 	   	  HTTP_404 = "404 Not Found",
-	   	  HTTP_401 = "401 Not Allowed";
+	   	  HTTP_403 = "403 Not Allowed";
 	   
 	   private Socket _Socket;
 	   
-	   public Sending(Socket sock,StreamOverHttp Del) {
+	   public SendingClass(Socket sock, StreamOverHttp hS) {
 		   _Socket=sock;
-		   _Del=Del;
+		   httpStream =hS;
 	   }
-	   public Sending(Socket sock,StreamOverHttp Del,String username, String password) {
+	   public SendingClass(Socket sock, StreamOverHttp hS, String username, String password) {
 		   _Socket=sock;
-		   _Del=Del;
+		   httpStream =hS;
 		   _SmbUser=username;
 		   _SmbPass=password;
 	   }
@@ -88,7 +88,7 @@ public class Sending extends Thread {
          	if (R.equals("404"))
          			sendError(_Socket, HTTP_404, "File not found");
          		else if (R.equals("401"))
-         			sendError(_Socket, HTTP_401, "Listing directory not allowed");
+         			sendError(_Socket, HTTP_403, "Listing directory not allowed");
          		else
          			sendError(_Socket, HTTP_BADREQUEST, R);
             return;
@@ -133,7 +133,7 @@ public class Sending extends Thread {
             if (minus.length>1)
          	   endAt = Long.parseLong(minus[1]);
 
-            if( (_Del.getProtocol().equals("smb") && startFrom >= _FileSize) || (_Del.getProtocol().equals("http") && startFrom > 0)){
+            if( (httpStream.getProtocol().equals("smb") && startFrom >= _FileSize) || (httpStream.getProtocol().equals("http") && startFrom > 0)){
                sendError(_Socket, HTTP_416, null);
                Log.d("handleResponse","Error HTTP 416 b");
                return;
@@ -147,7 +147,7 @@ public class Sending extends Thread {
 	            sendCount = endAt - startFrom + 1;
 	            if(sendCount < 0)
 	               sendCount = 0;
-	            if (_Del.getProtocol().equals("smb"))
+	            if (httpStream.getProtocol().equals("smb"))
             		_SmbStream.skip(startFrom);
 
             	status = "206 Partial Content";
@@ -162,10 +162,10 @@ public class Sending extends Thread {
             }
          }
          buf = new byte[100*1024];
-         if (_Del.getProtocol().equals("smb")) {
+         if (httpStream.getProtocol().equals("smb")) {
         	 sendResponse(_Socket, status, _fileMimeType, headers, _SmbStream, sendCount, buf, null);
          }
-         else if (_Del.getProtocol().equals("http")) {
+         else if (httpStream.getProtocol().equals("http")) {
         	 //buf = new byte[1000000];
         	 sendResponse(_Socket, status, _fileMimeType, headers, _Stream, sendCount, buf, null);
          }
@@ -213,27 +213,27 @@ public class Sending extends Thread {
 
          URI=URI.substring(1);
          
-         if (_Del.getProtocol().equals("smb")) {
-        	 SmbFile MonFichier;
+         if (httpStream.getProtocol().equals("smb")) {
+        	 SmbFile MainFile;
         	 if ( _SmbUser != null )
-        		 MonFichier=new SmbFile("smb://"+Uri.decode(URI),new NtlmPasswordAuthentication(null, _SmbUser, _SmbPass));
+        		 MainFile=new SmbFile("smb://"+Uri.decode(URI),new NtlmPasswordAuthentication(null, _SmbUser, _SmbPass));
         	 else
-        		 MonFichier=new SmbFile("smb://"+Uri.decode(URI));
-             if (MonFichier.isDirectory()) {
+        		 MainFile=new SmbFile("smb://"+Uri.decode(URI));
+             if (MainFile.isDirectory()) {
              	Log.d("decodeHeader","Directory not allowed");
                  return "401";
              }
              // 401
-             if (!MonFichier.exists()) {
+             if (!MainFile.exists()) {
              	Log.d("decodeHeader","File Not Found");
                  return "404";
              }
-	         _SmbStream = new SmbFileInputStream(MonFichier);
-	         _FileSize= MonFichier.length();
+	         _SmbStream = new SmbFileInputStream(MainFile);
+	         _FileSize= MainFile.length();
 	         _fileMimeType="video/x-"+getExtension(URI);
 	         //_fileMimeType=MonFichier.getContentType();
          } else {
-        	 URL address = new URL(_Del.getUrl()); 
+        	 URL address = new URL(httpStream.getUrl());
         	 HttpURLConnection connection = (HttpURLConnection)address.openConnection();
         	 _Stream=connection.getInputStream();
         	 _fileMimeType=connection.getContentType();
@@ -272,7 +272,7 @@ private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf,
 	  Log.d("copyStream","Max Size:"+maxSize);
 	  if (maxSize < 0) maxSize=999999999;
 	  int count;
-  while(maxSize>0 && (!_Del.Stoping)){
+  while(maxSize>0 && (!httpStream.Stoping)){
      count = (int)Math.min(maxSize, tmpBuf.length);
      try {
      	//Log.d("copyStream","Read");

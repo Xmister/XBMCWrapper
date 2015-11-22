@@ -14,10 +14,6 @@
         !PVR!
 
         !DAV!
-        
-		
-		<!-- Internet streams -- Disabled for now -->
-		<!--<rule internetstream="true" player="MXPlayerFree" />-->
 
 		!VIDEO!
 	</rules>

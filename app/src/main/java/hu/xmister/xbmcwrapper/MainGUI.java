@@ -24,7 +24,7 @@ import com.google.android.vending.licensing.ServerManagedPolicy;
 import com.google.android.vending.licensing.AESObfuscator;
 import hu.xmister.xbmcwrapper.License;
 
-public class Go extends FragmentActivity {
+public class MainGUI extends FragmentActivity {
 
 	static final int ITEMS = 4;
 	MyAdapter mAdapter;

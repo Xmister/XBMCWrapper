@@ -35,7 +35,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlayerView extends android.support.v4.app.FragmentActivity {
+public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	private String FileSmb="";
 	private StreamOverHttp Serv=null;
 	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox", ""};

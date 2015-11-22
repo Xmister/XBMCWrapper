@@ -315,7 +315,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		((Go)getActivity()).save();
+		((MainGUI)getActivity()).save();
 		super.onPause();
 	}
 }

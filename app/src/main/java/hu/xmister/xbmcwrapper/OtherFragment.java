@@ -239,7 +239,7 @@ public class OtherFragment extends Fragment {
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		((Go)getActivity()).save();
+		((MainGUI)getActivity()).save();
 		super.onPause();
 	}
 }

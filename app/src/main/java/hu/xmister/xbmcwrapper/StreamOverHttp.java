@@ -80,7 +80,7 @@ public class StreamOverHttp extends Thread {
 		}
 		
 		if (Sock != null) {
-			Sending SendSock=new Sending(Sock,this,_SmbUser,_SmbPass);
+			SendingClass SendSock=new SendingClass(Sock,this,_SmbUser,_SmbPass);
 			SendSock.start();
 		}
 		else
