@@ -236,7 +236,12 @@ public class SendingClass extends Thread {
         	 URL address = new URL(httpStream.getUrl());
         	 HttpURLConnection connection = (HttpURLConnection)address.openConnection();
         	 _Stream=connection.getInputStream();
-        	 _fileMimeType=connection.getContentType();
+             if ( httpStream.getProtocol().equals("pvr") ) {
+                 _fileMimeType = "video/x-mpegts";
+                 Log.d("decodeHeader", "Overriding mime type to: "+_fileMimeType);
+             }
+             else
+        	    _fileMimeType=connection.getContentType();
         	 //_fileMimeType="Video/x-matroska";
         	 _FileSize=-1;
         	 //_FileSize=-1;

@@ -250,11 +250,11 @@ public class MainFragment extends Fragment implements OnClickListener {
 								break;
 							case 2:
 								temp += "\t<rule video=\"true\" videoresolution=\"720\" player=\"XBMCWrapper\"/>\n";
-								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*720.*\" player=\"XBMCWrapper\"/>\n";
 								break;
 							case 3:
 								temp += "\t<rule video=\"true\" videoresolution=\"1080\" player=\"XBMCWrapper\"/>\n";
-								temp += "\t<rule filename=\".*540.*\" player=\"XBMCWrapper\"/>\n";
+								temp += "\t<rule filename=\".*1080.*\" player=\"XBMCWrapper\"/>\n";
 								break;
 							}
 						}

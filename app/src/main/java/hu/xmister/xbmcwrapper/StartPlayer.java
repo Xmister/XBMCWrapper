@@ -228,14 +228,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 					    	if (port == null) {
 								port="7522";
 							}
-							url="http://"+host+":"+port+":/upnp/channelstream/"+id+".ts";
+							url="http://"+host+":"+port+"/upnp/channelstream/"+id+".ts";
 							break;
 						case 3:
 							//http://10.0.1.10:8866/live?channel=2
 							if (port == null) {
 								port="8866";
 							}
-							url="http://"+host+":"+port+":/live?channel="+id;
+							url="http://"+host+":"+port+"/live?channel="+id;
 							break;
 					    default:
 					    	url=null;
