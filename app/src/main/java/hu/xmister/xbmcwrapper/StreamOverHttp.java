@@ -13,7 +13,7 @@ import android.util.Log;
  */
 public class StreamOverHttp extends Thread {
 
-   public Boolean Stoping=false;
+   public Boolean Stopping =false;
    private ServerSocket serverSocket=null;
    private int port=37689;
    private String protocol = "smb";
@@ -80,7 +80,7 @@ public class StreamOverHttp extends Thread {
 		Log.d("ServiceHttp", "Socket already in use , abort");
 		return;
 	}
-	while (!Stoping) {
+	while (!Stopping) {
 		Socket Sock = null;
 
 		try {
@@ -106,7 +106,7 @@ public class StreamOverHttp extends Thread {
    
    public void Stop() {
 	   Log.d("ServiceHttp", "Request Stop");
-	   Stoping=true;
+	   Stopping =true;
 	   if (serverSocket!=null) {
 		   try {
 			serverSocket.close();
