@@ -139,11 +139,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				if (inputURL.startsWith("smb://")) {
 					Log.d("xbmcwrapper","Launch SMB: "+ inputURL);
 					setStatus("Samba URL detected...",0);
+					//URL replace
 					if (sharedPreferences.getBoolean("r1", false))
 						inputURL = inputURL.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
 					if (sharedPreferences.getBoolean("r2", false))
 						inputURL = inputURL.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
+
+					//If the replaced URL became a local file, then just play it
 					if (inputURL.startsWith("file://")) {
 						String pkg=sharedPreferences.getString("file", "system");
 						setStatus("Launching " + pkg + " with local file...");
@@ -154,6 +157,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 					}
 					else {
 						if ( sharedPreferences.getInt("method", 2) == 3 ) {
+							//Show a dialog, if the user didn't set a specifig method
 							ChoiceDialog md = new ChoiceDialog("Choose Streaming Method",new String[]{"MiniDLNA","CIFS","HTTP"},di,dc,dd);
 							md.show(getSupportFragmentManager(),"method");
 						}
@@ -181,9 +185,11 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				else if (inputURL.startsWith("http://")) {
 					Log.d("xbmcwrapper","Launch HTTP: "+ inputURL);
 					setStatus("Starting HTTP...",0);
+					//If we should re-stream it, then start the server
 					if (sharedPreferences.getBoolean("rehttp", true)) {
 						startHTTPStreaming("http", inputURL);
 					}
+					//Otherwise just pass the URL
 					else {
 						String pkg=sharedPreferences.getString("http", "system");
 						setStatus("Launching "+pkg+" with URL");
@@ -201,6 +207,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 					}
 					setStatus("Starting PVR...",0);
 					Log.d("xbmcwrapper","Launch PVR: "+ inputURL);
+					//Get the sent channel number
 					Pattern pattern1 = Pattern.compile("([^/]+$)");
 					Pattern pattern2 = Pattern.compile("([0-9]*?)\\.pvr$");
 					setStatus("Mapping channel...",0);
@@ -471,6 +478,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			inputURL = extras.toString();
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
+		//Charset for mounting. Not used right now.
 		switch ( se.getInt("charset",0) ) {
 			case 0:
 				CHARSET="UTF-8";
@@ -619,7 +627,9 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			executeSu(cmd); //Just to make sure there is no stuck mount.
 			cmd=getBB()+"mount -o remount,ro /\n";
 			executeSu(cmd);
+			//Try some commands that should work with most versions of the cifs module.
 			if (!smbuser.equals("")) {
+				//User login
 				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
@@ -627,6 +637,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o user=" + smbuser + (!smbpass.equals("") ? ",password=" + smbpass : "") + ",ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 			} else {
+				//Anonymus
 				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf16 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=guest,ro,iocharset=utf8 " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 				commands.add("mount -t cifs -o username=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
@@ -635,8 +646,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				commands.add("mount -t cifs -o user=guest,ro " + smbpath.substring(0, smbpath.indexOf(smbfile) - 1) + " " + MOUNT_PATH);
 			}
 			int i=0,res=0;
+			//Execute the commands
 			do {
 				cmd=getBB()+commands.get(i++)+"\n";
+				//Show some dbug if needed
 				if (sharedPreferences.getBoolean("cb_mount",false)) {
 					setStatus(cmd,1000);
 				}
@@ -676,8 +689,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			}
 			
 			try {
+				//Wait for the server to find a port to listen on
 				while (Serv.getPort() == 0) Thread.sleep(500);
 			} catch (Exception e) {}
+			//Read the player settings
 			String pkg=sharedPreferences.getString("samba", "system");
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);

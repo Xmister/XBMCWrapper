@@ -130,7 +130,8 @@ public class SendingClass extends Thread {
                return;
             }
             Log.d("Http","Range:" + range);
-            
+
+            //Parse the reqested range
             range = range.substring(6);
             long startFrom = 0, endAt = -1;
             String[] minus=range.split("-");
@@ -170,6 +171,8 @@ public class SendingClass extends Thread {
             	sendCount=-1;
             }
          }
+
+         //100KB buffer
          buf = new byte[100*1024];
          if (httpStream.getProtocol().equals("smb")) {
         	 sendResponse(_Socket, status, _fileMimeType, headers, _SmbStream, sendCount, buf, null);
@@ -247,7 +250,6 @@ public class SendingClass extends Thread {
 	         _SmbStream = new SmbFileInputStream(MainFile);
 	         _FileSize= MainFile.length();
 	         _fileMimeType="video/x-"+getExtension(URI);
-	         //_fileMimeType=MonFichier.getContentType();
          } else {
         	 URL address = new URL(httpStream.getUrl());
         	 HttpURLConnection connection = (HttpURLConnection)address.openConnection();
@@ -304,32 +306,58 @@ private void sendError(Socket socket, String status, String msg) throws Interrup
      */
 private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf, long maxSize) {
 	  Log.d("copyStream", "Max Size:" + maxSize);
-	  if (maxSize < 0) maxSize=999999999;
 	  int count;
-  while(maxSize>0 && (!httpStream.Stoping)){
-     count = (int)Math.min(maxSize, tmpBuf.length);
-     try {
-     	//Log.d("copyStream","Read");
-			count = in.read(tmpBuf, 0, count);
-		} catch (Exception e) {
-			Log.d("copyStream","Error "+e.getMessage());
-			return;
-		}
-     if(count<0) {
-     	Log.d("copyStream","Finished");
-        break;
-     }
-     try {
-     	//Log.d("copyStream","Write");
-			out.write(tmpBuf, 0, count);
-		} catch (Exception e) {
-			Log.d("copyStream","Error "+e.getMessage());
-			return;
-		}
-     
-     maxSize -= count;
-     //Log.d("copyStream"," Count:"+count+" Maxsize:"+maxSize);
-  } 
+    if ( maxSize < 0 ) {
+        do {
+            try {
+                //Log.d("copyStream","Read");
+                count = in.read(tmpBuf, 0, tmpBuf.length);
+            } catch (Exception e) {
+                Log.d("copyStream","Error "+e.getMessage());
+                return;
+            }
+            if(count<0) {
+                Log.d("copyStream","Finished");
+                break;
+            }
+            try {
+                //Log.d("copyStream","Write");
+                out.write(tmpBuf, 0, count);
+            } catch (Exception e) {
+                Log.d("copyStream","Error "+e.getMessage());
+                return;
+            }
+
+            //Log.d("copyStream"," Count:"+count+" Maxsize:"+maxSize);
+        } while(count > 0 && (!httpStream.Stopping));
+    }
+    else {
+        while( maxSize > 0 && (!httpStream.Stopping)){
+            count = (int)Math.min(maxSize, tmpBuf.length);
+            try {
+                //Log.d("copyStream","Read");
+                count = in.read(tmpBuf, 0, count);
+            } catch (Exception e) {
+                Log.d("copyStream","Error "+e.getMessage());
+                return;
+            }
+            if(count<0) {
+                Log.d("copyStream","Finished");
+                break;
+            }
+            try {
+                //Log.d("copyStream","Write");
+                out.write(tmpBuf, 0, count);
+            } catch (Exception e) {
+                Log.d("copyStream","Error "+e.getMessage());
+                return;
+            }
+
+            maxSize -= count;
+            //Log.d("copyStream"," Count:"+count+" Maxsize:"+maxSize);
+        }
+    }
+
 }
 
     /**
