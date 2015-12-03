@@ -20,6 +20,9 @@ import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
 
+/**
+ * Every HTTP connection has an instance of this Thread.
+ */
 public class SendingClass extends Thread {
 	   
 	   private StreamOverHttp httpStream;
@@ -51,11 +54,17 @@ public class SendingClass extends Thread {
 		   _SmbPass=password;
 	   }
 
+    /**
+     * Starting the thread with StartReceive().
+     */
 	@Override
 	   public void run() {
 		   StartReceive();
 	   }
-	
+
+    /**
+     * Reads the client REQUEST and decides of the answer.
+     */
 	 private void StartReceive() {
 
 	
@@ -183,6 +192,13 @@ public class SendingClass extends Thread {
 	   
    }
 
+    /**
+     * Parses the client's requests. Can only handle GET requests.
+     * @param socket the socket of the client connection
+     * @param in BufferedReader of the input stream
+     * @param pre the parsed headers sent by the client
+     * @return error message or null.
+     */
    @SuppressLint("DefaultLocale")
 	private String decodeHeader(Socket socket, BufferedReader in, Properties pre) {
       try{
@@ -267,14 +283,27 @@ public class SendingClass extends Thread {
       return null;
   }
 
-// Error
+    /**
+     * Send an error message to the client, then closes the connection.
+     * @param socket the socket of the client connection
+     * @param status status code to send
+     * @param msg the message
+     * @throws InterruptedException
+     */
 private void sendError(Socket socket, String status, String msg) throws InterruptedException{
    sendResponse(socket, status, "text/plain", null, null, 0, null, msg);
    CloseAll();
 }
 
+    /**
+     * Copies the given input stream to the given output stream
+     * @param in the InputStream
+     * @param out the BufferedOutputStream
+     * @param tmpBuf the used buffer, parameter so it's size can be defined outside
+     * @param maxSize how many bytes to copy
+     */
 private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf, long maxSize) {
-	  Log.d("copyStream","Max Size:"+maxSize);
+	  Log.d("copyStream", "Max Size:" + maxSize);
 	  if (maxSize < 0) maxSize=999999999;
 	  int count;
   while(maxSize>0 && (!httpStream.Stoping)){
@@ -302,9 +331,18 @@ private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf,
      //Log.d("copyStream"," Count:"+count+" Maxsize:"+maxSize);
   } 
 }
-/**
- * Sends given response to the socket, and closes the socket.
- */
+
+    /**
+     * Sends given response to the socket, and closes the socket.
+     * @param socket the socket of the client connection
+     * @param status the status code
+     * @param mimeType mime type of the message
+     * @param header headers to send
+     * @param isInput the input stream if we want to copy that, otherwise null
+     * @param sendCount the byte count to send
+     * @param buf the buffer, parameter so it's size can be defined outside
+     * @param errMsg if we want to send an error message
+     */
 private void sendResponse(Socket socket, String status, String mimeType, Properties header, InputStream isInput, long sendCount, byte[] buf, String errMsg){
 	   BufferedOutputStream out=null;
 	   
@@ -355,7 +393,9 @@ private void sendResponse(Socket socket, String status, String mimeType, Propert
    } catch (Exception e) {}
 }
 
-// CleanUp
+    /**
+     * Cleans up the connection
+     */
 private void CloseAll() {
 	   // Clear
 	   try {
@@ -373,6 +413,11 @@ private void CloseAll() {
 	   } catch (Exception e) {}
 }
 
+    /**
+     * Gets the extension of a file
+     * @param s the file name
+     * @return the extension
+     */
 	private String getExtension(String s) {
 	    String ext = "video";
 	    int i = s.lastIndexOf('.');

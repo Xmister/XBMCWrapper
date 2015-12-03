@@ -8,6 +8,9 @@ import java.util.Random;
 
 import android.util.Log;
 
+/**
+ * The StreamOverHttp class is responsible for handling the HTTP server connections.
+ */
 public class StreamOverHttp extends Thread {
 
    public Boolean Stoping=false;
@@ -29,7 +32,11 @@ public class StreamOverHttp extends Thread {
    public synchronized String getProtocol() {
 	   return protocol;
    }
-   
+
+	/**
+	 * Starts the listening on the default port, or if it's not available, then finds one that is.
+	 * @throws IOException
+	 */
    private void startStreaming() throws IOException {
 			serverSocket = new ServerSocket();
 			serverSocket.setSoTimeout(500);
@@ -59,7 +66,10 @@ public class StreamOverHttp extends Thread {
 	   _SmbUser=sambaUser;
 	   _SmbPass=sambaPass;
    }
-   
+
+	/**
+	 * This Thread is responsible for accepting new connections, and creating a SendingClass for them.
+	 */
    @Override
    public void run() {
 	// Create socket

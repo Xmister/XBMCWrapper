@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+/**
+ * A helper class to easily create dialogs.
+ */
 @SuppressLint("ValidFragment")
 public class ChoiceDialog extends DialogFragment {
 	private DialogInterface.OnClickListener olistener;

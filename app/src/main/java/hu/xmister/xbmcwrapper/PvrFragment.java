@@ -17,6 +17,9 @@ import android.widget.EditText;
 
 import java.util.List;
 
+/**
+ * GUI configuration for PVR specific settings.
+ */
 public class PvrFragment extends Fragment {
 	int fragVal;
 	DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {

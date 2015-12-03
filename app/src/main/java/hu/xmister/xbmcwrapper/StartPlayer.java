@@ -5,17 +5,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.LicenseChecker;
 import com.google.android.vending.licensing.LicenseCheckerCallback;
 import com.google.android.vending.licensing.Policy;
-import com.google.android.vending.licensing.ServerManagedPolicy;
 
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
@@ -31,12 +28,14 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * The StartPlayer Activity is repsonsible for taking care of the input URL, and starting the needed player.
+ */
 public class StartPlayer extends android.support.v4.app.FragmentActivity {
-	private String FileSmb="";
+	private String inputURL ="";
 	private StreamOverHttp Serv=null;
 	private final String BB_BINARIES[]={"/system/bin/busybox", "/system/xbin/busybox", "/xbin/busybox", "/bin/busybox", "/sbin/busybox", "busybox", ""};
 	private int BB_BINARY=0;
@@ -50,8 +49,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	private String CHARSET;
     public int retryCount=0;
 	private boolean cleaning=false;
-    
+	/**
+	 * The MyLicenseCheckerCallback class is the one that checks the License response of Google Play.
+	 */
     private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
+		/**
+		 * Decides what to do with the given License result
+		 * @param res the license result.
+		 */
 		private void resultHandler(final int res) {
 	        mHandler.post(new Runnable() {
 	            public void run() {
@@ -72,6 +77,11 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	            }
 	        });
 	    }
+
+		/**
+		 * The License is legit.
+		 * @param reason Policy.LICENSED or Policy.RETRY typically.
+		 */
 	    public void allow(int reason) {
 	        if (isFinishing()) {
 	            // Don't update UI if Activity is finishing.
@@ -81,6 +91,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	        resultHandler(0);
 	    }
 
+		/**
+		 * Called when the license check failed
+		 * @param reason Policy.NOT_LICENSED or Policy.RETRY.
+		 */
 	    public void dontAllow(int reason) {
 	        if (isFinishing()) {
 	            // Don't update UI if Activity is finishing.
@@ -102,13 +116,19 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	        }
 	    }
 
+		/**
+		 * Called when an error happens in license checking
+		 * @param errorCode
+		 */
 		@Override
 		public void applicationError(int errorCode) {
-			// TODO Auto-generated method stub
 			resultHandler(1);
 		}
 	}
-    
+
+	/**
+	 * The app continues here after a successful license check. URL parsing happens here
+	 */
     public void licenseOK() {
 		SharedPreferences se = getSharedPreferences("default",0);
     		new Thread((new Runnable() {
@@ -116,20 +136,20 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			@Override
 			public void run() {
 				SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
-				if (FileSmb.startsWith("smb://")) {
-					Log.d("smbwrapper","Launch SMB: "+FileSmb);
+				if (inputURL.startsWith("smb://")) {
+					Log.d("xbmcwrapper","Launch SMB: "+ inputURL);
 					setStatus("Samba URL detected...",0);
 					if (sharedPreferences.getBoolean("r1", false))
-						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
+						inputURL = inputURL.replaceFirst(sharedPreferences.getString("rfrom", "(?i)smb://10.0.1.4/2tb"), sharedPreferences.getString("rto", "file:///mnt/sata"));
 					if (sharedPreferences.getBoolean("r2", false))
-						FileSmb = FileSmb.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
+						inputURL = inputURL.replaceFirst(sharedPreferences.getString("rfrom2", "(?i)smb://cubie/2tb"), sharedPreferences.getString("rto2", "file:///mnt/sata"));
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-					if (FileSmb.startsWith("file://")) {
+					if (inputURL.startsWith("file://")) {
 						String pkg=sharedPreferences.getString("file", "system");
 						setStatus("Launching " + pkg + " with local file...");
 						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-						FileSmb = FileSmb.replaceFirst("(?i)file://", "");
-						LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
+						inputURL = inputURL.replaceFirst("(?i)file://", "");
+						LaunchIntent.setDataAndType(Uri.fromFile(new File(inputURL)), "video/*");
 						startActivityForResult(LaunchIntent, 1);
 					}
 					else {
@@ -140,51 +160,51 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 						else di.onClick(null, sharedPreferences.getInt("method", 2));
 					}
 				}
-				else if (FileSmb.startsWith("file://")) {
+				else if (inputURL.startsWith("file://")) {
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					String pkg=sharedPreferences.getString("file", "system");
 					setStatus("Launching " + pkg + " with local file...");
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-					FileSmb = FileSmb.replaceFirst("(?i)file://", "");
-					LaunchIntent.setDataAndType(Uri.fromFile(new File(FileSmb)), "video/*");
+					inputURL = inputURL.replaceFirst("(?i)file://", "");
+					LaunchIntent.setDataAndType(Uri.fromFile(new File(inputURL)), "video/*");
 					startActivityForResult(LaunchIntent,1);
 				}
-				else if (FileSmb.startsWith("dav://")) {
+				else if (inputURL.startsWith("dav://")) {
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					String pkg=sharedPreferences.getString("http", "system");
 					setStatus("Launching " + pkg + " with local DAV->HTTP URL...");
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-					FileSmb = FileSmb.replaceFirst("(?i)dav://", "http://");
-					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+					inputURL = inputURL.replaceFirst("(?i)dav://", "http://");
+					LaunchIntent.setDataAndType(Uri.parse(inputURL), "video/*");
 					startActivityForResult(LaunchIntent, 1);
 				}
-				else if (FileSmb.startsWith("http://")) {
-					Log.d("smbwrapper","Launch HTTP: "+FileSmb);
+				else if (inputURL.startsWith("http://")) {
+					Log.d("xbmcwrapper","Launch HTTP: "+ inputURL);
 					setStatus("Starting HTTP...",0);
 					if (sharedPreferences.getBoolean("rehttp", true)) {
-						startHTTPStreaming("http",FileSmb);
+						startHTTPStreaming("http", inputURL);
 					}
 					else {
 						String pkg=sharedPreferences.getString("http", "system");
 						setStatus("Launching "+pkg+" with URL");
 						Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 						if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-						LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+						LaunchIntent.setDataAndType(Uri.parse(inputURL), "video/*");
 						startActivityForResult(LaunchIntent,1);
 					}
 				}
-				else if (FileSmb.startsWith("pvr://")) {
+				else if (inputURL.startsWith("pvr://")) {
 					if ( sharedPreferences.getInt("backend", 1) == 0 ) {
 					    setStatus("PVR Disabled");
 					    finish();
 					    return;
 					}
 					setStatus("Starting PVR...",0);
-					Log.d("smbwrapper","Launch PVR: "+FileSmb);
+					Log.d("xbmcwrapper","Launch PVR: "+ inputURL);
 					Pattern pattern1 = Pattern.compile("([^/]+$)");
 					Pattern pattern2 = Pattern.compile("([0-9]*?)\\.pvr$");
 					setStatus("Mapping channel...",0);
-					Matcher matcher1 = pattern1.matcher(FileSmb);
+					Matcher matcher1 = pattern1.matcher(inputURL);
 					String id=null;
 					if (matcher1.find())
 					{
@@ -262,18 +282,24 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 					setStatus("Launching " + pkg + " with URL");
 					Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
 					if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
-					LaunchIntent.setDataAndType(Uri.parse(FileSmb), "video/*");
+					LaunchIntent.setDataAndType(Uri.parse(inputURL), "video/*");
 					startActivityForResult(LaunchIntent, 1);
 				}
 				
 			}
 		})).start();
 	}
-	
+
+	/**
+	 * Calls the license checker library
+	 */
 	public void licenseCheck() {
 		mChecker.checkAccess(mLicenseCheckerCallback);
 	}
-	
+
+	/**
+	 * Handles failed licenses
+	 */
 	public void licenseFail() {
 		new Thread((new Runnable() {
 
@@ -304,7 +330,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
-			final String FileSmbWrap=FileSmb;
+			final String FileSmbWrap= inputURL;
 			switch (which) {
 			case 0:
 				new Thread(new Runnable() {
@@ -358,7 +384,12 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			chosen=true;
 		}
 	};
-	
+
+	/**
+	 * Executes command in SuperUser Shell
+	 * @param cmd the command to execute
+	 * @return the result of the execution
+	 */
 	private int executeSu(String cmd) {
 		try {
 			Process p = Runtime.getRuntime().exec("su");   
@@ -374,14 +405,22 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			return -1;
 		}
 	}
-	
+
+	/**
+	 * Finds the busybox binary
+	 */
 	private void findBB() {
 		for (BB_BINARY=0; BB_BINARY<BB_BINARIES.length; BB_BINARY++) {
 			if ( new File(BB_BINARIES[BB_BINARY]).exists() ) break;
 		}
 		BB_BINARY=Math.min(BB_BINARY, BB_BINARIES.length-1);
 	}
-	
+
+	/**
+	 * Shows the user a status message
+	 * @param msg the message to show
+	 * @param sleep how long the messages should be displayed in ms
+	 */
 	private void setStatus(final String msg, long sleep) {
 		runOnUiThread(new Runnable() {
 
@@ -397,11 +436,19 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			} catch (Exception e) {}
 		}
 	}
-	
+
+	/**
+	 * Shows the user a status message to the user for 1500ms
+	 * @param msg the message to show
+	 */
 	private void setStatus(final String msg) {
 		setStatus(msg, 1500);
 	}
-	
+
+	/**
+	 * Called by the system when the app has started. Parses the input, defines the content, and checks for license.
+	 * @param savedInstanceState
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -418,10 +465,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		StrictMode.setThreadPolicy(policy);
 		mHandler = new Handler();
 		Uri extras = getIntent().getData();
-		Log.d("smbwrapper", "Launch");
+		Log.d("xbmcwrapper", "Launch");
 		findBB();
 		if (extras != null) {
-			FileSmb = extras.toString();
+			inputURL = extras.toString();
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
 		switch ( se.getInt("charset",0) ) {
@@ -453,7 +500,12 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		licenseOK();
 		
 	}
-	
+
+	/**
+	 * Plays the given Samba file through a MiniDLNA server
+	 * @param FileSmb the file to play
+	 * @throws Exception usually I/O or connection exception can happen
+	 */
 	private void miniDLNAPlay(final String FileSmb) throws Exception {
 		setStatus("Trying miniDLNA...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
@@ -497,11 +549,21 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		startActivityForResult(LaunchIntent,1);
 	}
 
+	/**
+	 * Returns the already found busybox binary if any, otherwise an empty string
+	 * @return the binary
+	 */
 	private String getBB() {
 		if (BB_BINARIES[BB_BINARY].isEmpty()) return "";
 		else return BB_BINARIES[BB_BINARY]+" ";
 	}
 
+	/**
+	 * Parses a custom mount command and replaces the special words with data
+	 * @param cmd the command to parse
+	 * @param smbpath samba share path
+	 * @return the parsed command
+	 */
 	private String parseCommand(String cmd, String smbpath) {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		return cmd.replaceAll("(?i)%smbuser%",sharedPreferences.getString("smbuser",""))
@@ -509,7 +571,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				.replaceAll("(?i)%smbpath%", smbpath)
 				.replaceAll("(?i)%mount_path%", sharedPreferences.getString("cifs", "/mnt/xbmcwrapper"));
 	}
-	
+
+	/**
+	 * Mounts the samba share using cifs, and calls the player to play from there.
+	 * Needs root and busybox.
+	 * Can use default commands or custom ones by the user.
+	 * @param FileSmb
+	 * @throws Exception
+	 */
 	private void cifsMountPlay(final String FileSmb) throws Exception {
 		setStatus("Trying CIFS Mount...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
@@ -577,19 +646,24 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			if (res != 0) throw new Exception("Unable to mount"); //Give up
 		}
 		final Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		Log.d("smbwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
+		Log.d("xbmcwrapper","Launch Player: "+MOUNT_PATH+File.separator+smbfile);
 		String pkg=sharedPreferences.getString("samba", "system");
 		setStatus("Launching "+pkg+" with CIFS Mounted path...");
 		if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 		LaunchIntent.setDataAndType(Uri.fromFile(new File(MOUNT_PATH+File.separator+smbfile)), "video/*");
 				startActivityForResult(LaunchIntent,25);
 	}
-	
+
+	/**
+	 * Starts the HTTP server with either a Samba share file, or another http stream
+	 * @param protocol can be smb, http, or pvr
+	 * @param FileSmb if the protocol is smb, this is the path for the file
+	 */
 	private void startHTTPStreaming(final String protocol, final String FileSmb) {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		Log.d("smbwrapper", "Launch Player: " + FileSmb);
+		Log.d("xbmcwrapper", "Launch Player: " + FileSmb);
 		if ( protocol.equals("smb") ) {
 			String smbuser=sharedPreferences.getString("smbuser", "");
 			String smbpass=sharedPreferences.getString("smbpass", "");
@@ -643,7 +717,11 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	public void onBackPressed() {
 			cleanup(1);
 	}
-	
+
+	/**
+	 * Cleans up the system and kills the players
+	 * @param res defines what should be cleaned up
+	 */
 	private void cleanup(final int res) {
 		if ( cleaning ) {
 

@@ -19,6 +19,9 @@ import android.widget.TableRow;
 
 import java.util.List;
 
+/**
+ * GUI for configuration options for Samba protocol.
+ */
 public class SmbFragment extends Fragment {
 
 	DialogInterface.OnDismissListener dd = new DialogInterface.OnDismissListener() {

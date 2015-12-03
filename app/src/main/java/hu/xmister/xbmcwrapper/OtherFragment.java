@@ -19,6 +19,9 @@ import android.content.SharedPreferences.Editor;
 
 import java.util.List;
 
+/**
+ * GUI configuration for other settings.
+ */
 public class OtherFragment extends Fragment {
 
 	int fragVal;

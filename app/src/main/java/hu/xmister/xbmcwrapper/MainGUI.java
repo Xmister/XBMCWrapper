@@ -24,6 +24,9 @@ import com.google.android.vending.licensing.ServerManagedPolicy;
 import com.google.android.vending.licensing.AESObfuscator;
 import hu.xmister.xbmcwrapper.License;
 
+/**
+ * The MainGUI activity contains all the fragments for configuration.
+ */
 public class MainGUI extends FragmentActivity {
 
 	static final int ITEMS = 4;
@@ -35,8 +38,15 @@ public class MainGUI extends FragmentActivity {
     private static final String BASE64_PUBLIC_KEY = License.getKey();
     private static final byte[] SALT = License.getSalt();
     public int retryCount=0;
-	
+
+	/**
+	 * The MyLicenseCheckerCallback class is the one that checks the License response of Google Play.
+	 */
 	private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
+		/**
+		 * Decides what to do with the given License result
+		 * @param res the license result.
+		 */
 		private void resultHandler(final int res) {
 	        mHandler.post(new Runnable() {
 	            public void run() {
@@ -57,6 +67,11 @@ public class MainGUI extends FragmentActivity {
 	            }
 	        });
 	    }
+
+		/**
+		 * The License is legit.
+		 * @param reason Policy.LICENSED or Policy.RETRY typically.
+		 */
 	    public void allow(int reason) {
 	        if (isFinishing()) {
 	            // Don't update UI if Activity is finishing.
@@ -66,6 +81,10 @@ public class MainGUI extends FragmentActivity {
 	        resultHandler(0);
 	    }
 
+		/**
+		 * Called when the license check failed
+		 * @param reason Policy.NOT_LICENSED or Policy.RETRY.
+		 */
 	    public void dontAllow(int reason) {
 	        if (isFinishing()) {
 	            // Don't update UI if Activity is finishing.
@@ -87,13 +106,20 @@ public class MainGUI extends FragmentActivity {
 	        }
 	    }
 
+		/**
+		 * Called when an error happens in license checking
+		 * @param errorCode
+		 */
 		@Override
 		public void applicationError(int errorCode) {
 			// TODO Auto-generated method stub
 			resultHandler(1);
 		}
 	}
-	
+
+	/**
+	 * The app continues here after a successful license check. Builds up the GUI
+	 */
 	public void licenseOK() {
 		setContentView(R.layout.activity_go);
 		mAdapter = new MyAdapter(getSupportFragmentManager());
@@ -127,11 +153,17 @@ public class MainGUI extends FragmentActivity {
 				StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 	}
-	
+
+	/**
+	 * Calls the license checker library
+	 */
 	public void licenseCheck() {
 		mChecker.checkAccess(mLicenseCheckerCallback);
 	}
-	
+
+	/**
+	 * Handles failed licenses
+	 */
 	public void licenseFail() {
 				Toast.makeText(getApplicationContext(),
 						"License check failed!", Toast.LENGTH_LONG).show();
@@ -148,6 +180,11 @@ public class MainGUI extends FragmentActivity {
 		})).start();
 	}
 
+	/**
+	 * Shows the user a status message
+	 * @param msg the message to show
+	 * @param sleep how long the messages should be displayed in ms
+	 */
 	private void setStatus(final String msg, long sleep) {
 		runOnUiThread(new Runnable() {
 
@@ -164,6 +201,10 @@ public class MainGUI extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * Called by the system when the app has started. Defines the content, and checks for license.
+	 * @param savedInstanceState
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -186,6 +227,9 @@ public class MainGUI extends FragmentActivity {
 
 	}
 
+	/**
+	 * The FragmentAdapter that handles the switching between the fragments.
+	 */
 	public static class MyAdapter extends FragmentPagerAdapter {
 		public MyAdapter(FragmentManager fragmentManager) {
 			super(fragmentManager);
@@ -213,6 +257,11 @@ public class MainGUI extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * Creates a menu for the applications. The only item in it is Save.
+	 * @param menu The menu that should be inflated with our layout.
+	 * @return Always true, because we always inflate the menu.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) { // Inflate the
 		/* menu; this adds items to the action bar if it is present. */
@@ -232,6 +281,9 @@ public class MainGUI extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * Central save function, that calls all the fragments save functions.
+	 */
 	public void save() {
 		SmbFragment.init(1).save();
 		PvrFragment.init(2).save();

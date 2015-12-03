@@ -22,6 +22,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.AssetManager;
 
+/**
+ * The Main Page of the GUI. Also handles the xml editing.
+ */
 public class MainFragment extends Fragment implements OnClickListener {
 
 	int fragVal;
@@ -57,6 +60,10 @@ public class MainFragment extends Fragment implements OnClickListener {
 		return layoutView;
 	}
 
+	/**
+	 * Called by the system when the we are visible. Finds the Kodi config directory, and updates the main text.
+	 * @param savedInstanceState
+	 */
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -111,6 +118,9 @@ public class MainFragment extends Fragment implements OnClickListener {
 		}
 	}
 
+	/**
+	 * Edits the XML file to reflect the settings.
+	 */
 	private void saveXML() {
 		if (getActivity() != null) {
 			AssetManager assetManager = getActivity().getAssets();
@@ -276,12 +286,19 @@ public class MainFragment extends Fragment implements OnClickListener {
 		}
 	}
 
+	/**
+	 * Install button's function. Saves the XML and updates the main text.
+	 * @param v
+	 */
 	@Override
 	public void onClick(View v) {
 		saveXML();
 		Montext.setText("XML Successfully installed! Now you can make changes in the app.\nPlease fill in your Samba(Windows share) username and password, and choose your favorite player!\nAfter the changes, you should exit Kodi, and restart it to take effect!.\nThe default settings will handle HD videos and will let android choose your player every time.");
 	}
 
+	/**
+	 * Saves the settings when called.
+	 */
 	public void save() {
 		if (getActivity() != null) {
 			try {
