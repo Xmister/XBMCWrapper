@@ -10,9 +10,11 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.LicenseChecker;
 import com.google.android.vending.licensing.LicenseCheckerCallback;
 import com.google.android.vending.licensing.Policy;
+import com.google.android.vending.licensing.ServerManagedPolicy;
 
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
@@ -486,7 +488,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 				break;
 		}
 
-		/*
+
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -496,8 +498,8 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();*/
-		licenseOK();
+        licenseCheck();
+		//licenseOK();
 		
 	}
 

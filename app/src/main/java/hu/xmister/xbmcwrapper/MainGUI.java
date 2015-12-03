@@ -212,7 +212,7 @@ public class MainGUI extends FragmentActivity {
 		setStatus("Please wait! Checking license...", 500);
 
 		mHandler = new Handler();
-		/*
+
 		// Construct the LicenseCheckerCallback. The library calls this when done.
         mLicenseCheckerCallback = new MyLicenseCheckerCallback();
 
@@ -222,8 +222,8 @@ public class MainGUI extends FragmentActivity {
                 new AESObfuscator(SALT, getPackageName(), License.getID(this))),
             BASE64_PUBLIC_KEY 
             );
-        licenseCheck();*/
-		licenseOK();
+        licenseCheck();
+		//licenseOK();
 
 	}
 
