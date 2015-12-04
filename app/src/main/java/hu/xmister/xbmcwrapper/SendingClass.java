@@ -29,6 +29,9 @@ import android.util.Log;
  */
 public class SendingClass extends Thread {
 
+    /**
+     * Helper class for better Exception management
+     */
     private class MyException extends Exception {
         public String code;
         public MyException(String code, String message) {
@@ -37,12 +40,8 @@ public class SendingClass extends Thread {
         }
     };
 
+    //Owner class to reach some fields
     private StreamOverHttp httpStream;
-    private String _fileMimeType;
-    private long _FileSize;
-    private SmbFileInputStream _SmbStream=null;
-    private InputStream _Stream=null,
-                        inS=null;
     private String
             _SmbUser=null,
             _SmbPass=null;
@@ -79,111 +78,19 @@ public class SendingClass extends Thread {
      * Reads the client REQUEST and decides of the answer.
      */
     private void StartReceive() {
-        try{
-            inS = _Socket.getInputStream();
+        try {
+            InputStream inS = _Socket.getInputStream();
 
-            if(inS == null) {
+            if (inS == null) {
                 Log.d("handleResponse", "Null Stream");
+                return;
             }
-
-            //8K header limit should be enough
-            byte[] buf = new byte[8*1024];
-            int rlen = inS.read(buf, 0, buf.length);
-            if(rlen <= 0) {
-                Log.d("handleResponse","Null Size");
-                throw new MyException(HTTP_404, "File not found");
-            }
-            // Create a BufferedReader for parsing the header.
-            ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
-            BufferedReader hin = new BufferedReader(new InputStreamReader(hbis));
             Properties pre = new Properties();
             Log.d("handleResponse", "Decode header");
 
-            // Decode the header into params and header java properties
-            decodeHeader(_Socket, hin, pre);
-            String range = pre.getProperty("range");
+            decodeHeader(_Socket, new BufferedReader(new InputStreamReader(inS)), pre);
 
-            //FIFO List, so we can control the sequence
-            Queue<String> headers=new LinkedList<String>();
-
-            Log.d("handleResponse","FileSize:"+_FileSize);
-
-            long sendCount;
-
-            String status;
-            if(range==null) {
-                status = "200 OK";
-                headers.add("Content-Type: " + _fileMimeType);
-                if(_FileSize!=-1) {
-                    headers.add("Accept-Ranges: bytes");
-                    headers.add("Content-Length: " + _FileSize);
-                }
-                else
-                    headers.add("Accept-Ranges: none");
-                sendCount = _FileSize;
-                Log.d("handleResponse","SendCount:"+sendCount);
-            }
-            else {
-                if(!range.startsWith("bytes=")){
-                    Log.d("handleResponse", "Wrong range specification");
-                    throw new MyException(HTTP_400,"Wrong range specification");
-                }
-                Log.d("Http","Range:" + range);
-
-                //Parse the reqested range
-                range = range.substring(6);
-                long startFrom = 0, endAt = -1;
-                String[] minus=range.split("-");
-                if (minus.length>0) {
-                    startFrom = Long.parseLong(minus[0]);
-                } else
-                    startFrom = 0;
-
-                if (minus.length>1)
-                    endAt = Long.parseLong(minus[1]);
-
-                if( (httpStream.getProtocol().equals("smb") && startFrom >= _FileSize) || (httpStream.getProtocol().equals("http") && startFrom > 0))
-                    throw new MyException(HTTP_416,"Content out of range");
-
-                if (_FileSize > -1) {
-                    if(endAt < 0)
-                        endAt = _FileSize-1;
-
-                    Log.d("Http","From:" + startFrom+ "To:"+endAt);
-
-                    sendCount = endAt - startFrom + 1;
-                    if(sendCount < 0) {
-                        sendCount = 0;
-                        throw new MyException(HTTP_416, "Content out of range");
-                    }
-                    if (httpStream.getProtocol().equals("smb"))
-                        _SmbStream.skip(startFrom);
-
-                    status = "206 Partial Content";
-                    headers.add("Content-Type: " + _fileMimeType);
-                    headers.add("Content-Length: " + sendCount);
-                    headers.add("Accept-Ranges: bytes");
-                    String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + _FileSize;
-                    headers.add("Content-Range: "+ rangeSpec);
-                }
-                else {
-                    //We said we don't accept ranges, and yet we got a request. Just act like nothing happened.
-                    status = "200 OK";
-                    headers.add("Accept-Ranges: none");
-                    sendCount=-1;
-                }
-            }
-
-            //100KB buffer
-            buf = new byte[100*1024];
-            if (httpStream.getProtocol().equals("smb")) {
-                sendResponse(_Socket, status, headers, _SmbStream, sendCount, buf, null);
-            }
-            else if (httpStream.getProtocol().equals("http")) {
-                sendResponse(_Socket, status, headers, _Stream, sendCount, buf, null);
-            }
-
-            Log.d("Http","Http stream finished");
+            inS.close();
         }
 
         catch(Exception e){
@@ -198,7 +105,152 @@ public class SendingClass extends Thread {
             }
         }
 
-        CloseAll();
+        try {
+            _Socket.close();
+        } catch (Exception e) {}
+
+    }
+
+
+    /**
+     * Sends a Samba file through the stream
+     * @param pre contains client headers
+     * @param headers contains response headers so far
+     * @param fileSize the file size
+     * @param fileMimeType the file type
+     * @param smbStream the input file stream
+     * @throws MyException
+     * @throws IOException
+     */
+    private void sendFile( Properties pre, Queue<String> headers, long fileSize, String fileMimeType, SmbFileInputStream smbStream) throws MyException,IOException {
+        String range = pre.getProperty("range");
+
+        Log.d("handleResponse","FileSize:"+fileSize);
+
+        long sendCount=0;
+
+        String status = "500";
+        if(range==null) {
+            status = "200 OK";
+            headers.add("Content-Type: " + fileMimeType);
+            headers.add("Content-Length: " + fileSize);
+            headers.add("Accept-Ranges: bytes");
+            sendCount = fileSize;
+            Log.d("handleResponse", "SendCount:" + sendCount);
+        }
+        else {
+            if(!range.startsWith("bytes=")){
+                Log.d("handleResponse", "Wrong range specification");
+                throw new MyException(HTTP_400,"Wrong range specification");
+            }
+            Log.d("Http","Range:" + range);
+
+            //Parse the reqested range
+            range = range.substring(6);
+            long startFrom = 0, endAt = -1;
+            String[] minus=range.split("-");
+            if (minus.length>0) {
+                startFrom = Long.parseLong(minus[0]);
+            } else
+                startFrom = 0;
+
+            if (minus.length>1)
+                endAt = Long.parseLong(minus[1]);
+
+            if( startFrom >= fileSize )
+                throw new MyException(HTTP_416,"Content out of range");
+
+            if(endAt < 0)
+                endAt = fileSize-1;
+
+            Log.d("Http","From:" + startFrom+ "To:"+endAt);
+
+            sendCount = endAt - startFrom + 1;
+            if(sendCount < 0) {
+                sendCount = 0;
+                throw new MyException(HTTP_416, "Content out of range");
+            }
+
+            smbStream.skip(startFrom);
+
+            status = "206 Partial Content";
+            headers.add("Content-Type: " + fileMimeType);
+            headers.add("Content-Length: " + sendCount);
+            headers.add("Accept-Ranges: bytes");
+            String rangeSpec = "bytes " + startFrom + "-" + endAt + "/" + fileSize;
+            headers.add("Content-Range: " + rangeSpec);
+        }
+
+        //1MB buffer
+        byte[] buf = new byte[1*1024*1024];
+        sendResponse(_Socket, status, headers, smbStream, sendCount, buf, null);
+
+        try {
+            smbStream.close();
+        } catch (Exception e) {
+        }
+
+        Log.d("Http", "Http stream finished");
+
+    }
+
+    /**
+     * Sends a HTTP stream through our stream
+     * @param pre contains client headers
+     * @param headers contains response headers so far
+     * @param fileMimeType the file type
+     * @param stream the input stream
+     * @throws MyException
+     */
+    private void sendHTTP( Properties pre, Queue<String> headers, String fileMimeType, InputStream stream) throws MyException {
+        String range = pre.getProperty("range");
+
+        Log.d("handleResponse","HTTP Stream");
+
+        String status="500";
+        if(range==null) {
+            status = "200 OK";
+            headers.add("Content-Type: " + fileMimeType);
+            headers.add("Accept-Ranges: none");
+            Log.d("handleResponse","No range");
+        }
+        else {
+            if(!range.startsWith("bytes=")){
+                Log.d("handleResponse", "Wrong range specification");
+                throw new MyException(HTTP_400,"Wrong range specification");
+            }
+            Log.d("Http","Range:" + range);
+
+            //Parse the reqested range
+            range = range.substring(6);
+            long startFrom = 0, endAt = -1;
+            String[] minus=range.split("-");
+            if (minus.length>0) {
+                startFrom = Long.parseLong(minus[0]);
+            } else
+                startFrom = 0;
+
+            if (minus.length>1)
+                endAt = Long.parseLong(minus[1]);
+
+            //Range is not really supported on Re-Stream
+            if( startFrom > 0 )
+                throw new MyException(HTTP_416,"Content out of range");
+
+            //We said we don't accept ranges, and yet we got a request. Just act like nothing happened.
+            status = "200 OK";
+            headers.add("Accept-Ranges: none");
+        }
+
+        //1MB buffer
+        byte[] buf = new byte[1*1024*1024];
+        sendResponse(_Socket, status, headers, stream, -1, buf, null);
+
+        try {
+            stream.close();
+        } catch (Exception e) {}
+
+        Log.d("Http", "Http stream finished");
 
     }
 
@@ -249,7 +301,7 @@ public class SendingClass extends Thread {
     }
 
     /**
-     * Handle GET Requests
+     * Handle GET Requests, decides what to send
      * @param st the other items of the request
      * @param pre the other headers sent by the client
      * @throws MyException
@@ -264,6 +316,9 @@ public class SendingClass extends Thread {
         String URI = st.nextToken();
 
         URI = URI.substring(1);
+
+        //FIFO List, so we can control the sequence
+        Queue<String> headers=new LinkedList<String>();
 
         if (httpStream.getProtocol().equals("smb")) {
             //Stream Samba file
@@ -281,20 +336,23 @@ public class SendingClass extends Thread {
                 Log.d("decodeHeader", "File Not Found");
                 throw new MyException(HTTP_404,"File not found");
             }
-            _SmbStream = new SmbFileInputStream(MainFile);
-            _FileSize = MainFile.length();
-            _fileMimeType = "video/x-" + getExtension(URI);
+            SmbFileInputStream smbStream = new SmbFileInputStream(MainFile);
+            long fileSize = MainFile.length();
+            String fileMimeType = "video/x-" + getExtension(URI);
+            sendFile(pre,headers,fileSize,fileMimeType,smbStream);
         } else {
             //Re-Stream web URL
             URL address = new URL(httpStream.getUrl());
             HttpURLConnection connection = (HttpURLConnection) address.openConnection();
-            _Stream = connection.getInputStream();
+            InputStream stream = connection.getInputStream();
+            String fileMimeType;
             if (httpStream.getProtocol().equals("pvr")) {
-                _fileMimeType = "video/x-mpegts";
-                Log.d("decodeHeader", "Overriding mime type to: " + _fileMimeType);
-            } else
-                _fileMimeType = connection.getContentType();
-            _FileSize = -1;
+                fileMimeType = "video/x-mpegts";
+                Log.d("decodeHeader", "Overriding mime type to: " + fileMimeType);
+            } else {
+                fileMimeType = connection.getContentType();
+            }
+            sendHTTP(pre,headers,fileMimeType,stream);
         }
     }
 
@@ -307,7 +365,9 @@ public class SendingClass extends Thread {
      */
     private void sendError(Socket socket, String status, String msg) throws InterruptedException{
         sendResponse(socket, status, null, null, 0, null, msg);
-        CloseAll();
+        try {
+            _Socket.close();
+        } catch (Exception e) {};
     }
 
     /**
@@ -403,7 +463,7 @@ public class SendingClass extends Thread {
                     Log.d("sendResponse", header);
                     pw.print(header);
                     pw.print("\r\n");
-                    out.flush();
+                    pw.flush();
                 }
             }
             pw.print("\r\n");
@@ -426,25 +486,6 @@ public class SendingClass extends Thread {
         } catch (Exception e) {}
     }
 
-    /**
-     * Cleans up the connection
-     */
-    private void CloseAll() {
-        // Clear
-        try {
-            _Socket.close();
-        } catch (Exception e) {}
-
-        try {
-            if (inS != null)
-                inS.close();
-        } catch (Exception e) {}
-
-        try {
-            if (_SmbStream != null)
-                _SmbStream.close();
-        } catch (Exception e) {}
-    }
 
     /**
      * Gets the extension of a file
