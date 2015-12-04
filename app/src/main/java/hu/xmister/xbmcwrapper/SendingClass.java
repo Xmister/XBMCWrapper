@@ -143,7 +143,7 @@ public class SendingClass extends Thread {
                     endAt = Long.parseLong(minus[1]);
 
                 if( (httpStream.getProtocol().equals("smb") && startFrom >= _FileSize) || (httpStream.getProtocol().equals("http") && startFrom > 0))
-                    throw new MyException(HTTP_416,"Content out of range");;
+                    throw new MyException(HTTP_416,"Content out of range");
 
                 if (_FileSize > -1) {
                     if(endAt < 0)
@@ -152,8 +152,10 @@ public class SendingClass extends Thread {
                     Log.d("Http","From:" + startFrom+ "To:"+endAt);
 
                     sendCount = endAt - startFrom + 1;
-                    if(sendCount < 0)
+                    if(sendCount < 0) {
                         sendCount = 0;
+                        throw new MyException(HTTP_416, "Content out of range");
+                    }
                     if (httpStream.getProtocol().equals("smb"))
                         _SmbStream.skip(startFrom);
 
@@ -178,7 +180,6 @@ public class SendingClass extends Thread {
                 sendResponse(_Socket, status, headers, _SmbStream, sendCount, buf, null);
             }
             else if (httpStream.getProtocol().equals("http")) {
-                //buf = new byte[1000000];
                 sendResponse(_Socket, status, headers, _Stream, sendCount, buf, null);
             }
 
