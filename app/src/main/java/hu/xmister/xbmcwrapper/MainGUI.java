@@ -299,6 +299,6 @@ public class MainGUI extends FragmentActivity {
 	@Override
     protected void onDestroy() {
         super.onDestroy();
-        mChecker.onDestroy();
+        //mChecker.onDestroy();
     }
 }
