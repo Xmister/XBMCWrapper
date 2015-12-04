@@ -61,7 +61,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 	}
 
 	/**
-	 * Called by the system when the we are visible. Finds the Kodi config directory, and updates the main text.
+	 * Called by the system when we are visible. Finds the Kodi config directory, and updates the main text.
 	 * @param savedInstanceState
 	 */
 	@Override

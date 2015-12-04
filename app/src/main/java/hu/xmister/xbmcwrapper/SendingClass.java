@@ -40,12 +40,17 @@ public class SendingClass extends Thread {
         }
     };
 
-    //Owner class to reach some fields
+    /**
+     * Owner class to reach some fields of it
+     */
     private StreamOverHttp httpStream;
     private String
             _SmbUser=null,
             _SmbPass=null;
 
+    /**
+     * HTTP Status messages
+     */
     private static final String
             HTTP_400 = "400 Bad Request",
             HTTP_416 = "416 Range not satisfiable",
@@ -53,6 +58,9 @@ public class SendingClass extends Thread {
             HTTP_404 = "404 Not Found",
             HTTP_403 = "403 Not Allowed";
 
+    /**
+     * Socket of the client
+     */
     private Socket _Socket;
 
     public SendingClass(Socket sock, StreamOverHttp hS) {
@@ -181,8 +189,8 @@ public class SendingClass extends Thread {
             headers.add("Content-Range: " + rangeSpec);
         }
 
-        //1MB buffer
-        byte[] buf = new byte[1*1024*1024];
+        //768KB buffer
+        final byte[] buf = new byte[768 * 1024];
         sendResponse(_Socket, status, headers, smbStream, sendCount, buf, null);
 
         try {
@@ -377,9 +385,12 @@ public class SendingClass extends Thread {
      * @param tmpBuf the used buffer, parameter so it's size can be defined outside
      * @param maxSize how many bytes to copy
      */
-    private void copyStream(InputStream in, BufferedOutputStream out, byte[] tmpBuf, long maxSize) {
+    private void copyStream(InputStream in, BufferedOutputStream out, final byte[] tmpBuf, long maxSize) {
         Log.d("copyStream", "Max Size:" + maxSize);
         int count;
+        int i=0;
+        //final int burstLength= (2*1024*1024) / tmpBuf.length;
+        final int burstLength=2;
         if ( maxSize < 0 ) {
             //Continous stream
             do {
@@ -390,13 +401,18 @@ public class SendingClass extends Thread {
                     Log.d("copyStream","Error "+e.getMessage());
                     return;
                 }
-                if(count<0) {
+                if(count<1) {
                     Log.d("copyStream","Finished");
                     break;
                 }
                 try {
                     //Log.d("copyStream","Write");
                     out.write(tmpBuf, 0, count);
+                    if ( i < burstLength ) {
+                        //First few data should go out as soon as possible
+                        out.flush();
+                        i++;
+                    }
                 } catch (Exception e) {
                     Log.d("copyStream","Error "+e.getMessage());
                     return;
@@ -416,13 +432,18 @@ public class SendingClass extends Thread {
                     Log.d("copyStream","Error "+e.getMessage());
                     return;
                 }
-                if(count<0) {
+                if(count<1) {
                     Log.d("copyStream","Finished");
                     break;
                 }
                 try {
                     //Log.d("copyStream","Write");
                     out.write(tmpBuf, 0, count);
+                    if ( i < burstLength ) {
+                        //First few data should go out as soon as possible
+                        out.flush();
+                        i++;
+                    }
                 } catch (Exception e) {
                     Log.d("copyStream","Error "+e.getMessage());
                     return;
@@ -445,7 +466,7 @@ public class SendingClass extends Thread {
      * @param buf the buffer, parameter so it's size can be defined outside
      * @param errMsg if we want to send an error message
      */
-    private void sendResponse(Socket socket, String status, Queue<String> headers, InputStream isInput, long sendCount, byte[] buf, String errMsg){
+    private void sendResponse(Socket socket, String status, Queue<String> headers, InputStream isInput, long sendCount, final byte[] buf, String errMsg){
         BufferedOutputStream out=null;
 
         try{
@@ -456,7 +477,7 @@ public class SendingClass extends Thread {
                 String retLine = "HTTP/1.1 " + status + " \r\n";
                 Log.d("sendResponse", retLine);
                 pw.print(retLine);
-                out.flush();
+                pw.flush();
             }
             if(headers != null){
                 for (String header: headers){
