@@ -101,7 +101,6 @@ public class SmbFragment extends Fragment {
 
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
 		SharedPreferences sharedPreferences = getActivity().getSharedPreferences("default", 0);
 		PlayBT = (Button) getActivity().findViewById(R.id.bt_smbplayer);
@@ -260,7 +259,6 @@ public class SmbFragment extends Fragment {
 	
 	@Override
 	public void onPause() {
-		// TODO Auto-generated method stub
 		((MainGUI)getActivity()).save();
 		super.onPause();
 	}

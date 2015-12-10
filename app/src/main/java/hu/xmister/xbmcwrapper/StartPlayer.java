@@ -480,7 +480,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			inputURL = extras.toString();
 			Toast.makeText(getApplicationContext(), "Please wait", Toast.LENGTH_LONG).show();
 		}
-		//Charset for mounting. Not used right now.
+		//Charset settings for mounting. Not used right now.
 		switch ( se.getInt("charset",0) ) {
 			case 0:
 				CHARSET="UTF-8";
@@ -513,10 +513,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 
 	/**
 	 * Plays the given Samba file through a MiniDLNA server
-	 * @param FileSmb the file to play
+	 * @param fileSmb the file to play
 	 * @throws Exception usually I/O or connection exception can happen
 	 */
-	private void miniDLNAPlay(final String FileSmb) throws Exception {
+	private void miniDLNAPlay(final String fileSmb) throws Exception {
 		setStatus("Trying miniDLNA...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		String dburl=sharedPreferences.getString("mddb", "smb://10.0.1.4/2TB/minidlna/files.db");
@@ -541,7 +541,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		localdbo.close();
 		dbfile.close();
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(getExternalFilesDir(null).getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
-		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbpath=fileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		for (int x=0; x<sharedPreferences.getInt("mdcut", 2); x++) {
 			smbfile=smbfile.substring(smbfile.indexOf('/')+1);
@@ -586,14 +586,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	 * Mounts the samba share using cifs, and calls the player to play from there.
 	 * Needs root and busybox.
 	 * Can use default commands or custom ones by the user.
-	 * @param FileSmb
+	 * @param fileSmb
 	 * @throws Exception
 	 */
-	private void cifsMountPlay(final String FileSmb) throws Exception {
+	private void cifsMountPlay(final String fileSmb) throws Exception {
 		setStatus("Trying CIFS Mount...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
-		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbpath=fileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
@@ -672,21 +672,21 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	/**
 	 * Starts the HTTP server with either a Samba share file, or another http stream
 	 * @param protocol can be smb, http, or pvr
-	 * @param FileSmb if the protocol is smb, this is the path for the file
+	 * @param fileUrl this is the path for the file or the other stream
 	 */
-	private void startHTTPStreaming(final String protocol, final String FileSmb) {
+	private void startHTTPStreaming(final String protocol, final String fileUrl) {
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		
 		Intent LaunchIntent = new Intent(Intent.ACTION_VIEW);
-		Log.d("xbmcwrapper", "Launch Player: " + FileSmb);
+		Log.d("xbmcwrapper", "Launch Player: " + fileUrl);
 		if ( protocol.equals("smb") ) {
 			String smbuser=sharedPreferences.getString("smbuser", "");
 			String smbpass=sharedPreferences.getString("smbpass", "");
 			if (Serv == null) {
 				if ( !smbuser.equals(""))
-					Serv=new StreamOverHttp(protocol,FileSmb,smbuser,smbpass);
+					Serv=new StreamOverHttp(protocol,fileUrl,smbuser,smbpass);
 				else
-					Serv=new StreamOverHttp(protocol,FileSmb);
+					Serv=new StreamOverHttp(protocol,fileUrl);
 				Serv.start();
 			}
 			
@@ -699,14 +699,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 			setStatus("Launching " + pkg + " with HTTP Stream from Samba...");
 			if (!pkg.equals("system")) LaunchIntent.setPackage(pkg);
 			try {
-				LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:" + Serv.getPort() + "/" + FileSmb.substring(6)), "video/*");
+				LaunchIntent.setDataAndType(Uri.parse("http://127.0.0.1:" + Serv.getPort() + "/" + fileUrl.substring(6)), "video/*");
 			} catch (Exception e) {
 				Log.e("urlencode",e.getMessage());
 			}
 		}
 		else if ( protocol.equals("http") || protocol.equals("pvr") ) {
 			if (Serv == null) {
-				Serv=new StreamOverHttp("http",FileSmb);
+				Serv=new StreamOverHttp("http",fileUrl);
 				Serv.start();
 			}
 			

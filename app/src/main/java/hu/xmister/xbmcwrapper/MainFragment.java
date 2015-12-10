@@ -61,12 +61,11 @@ public class MainFragment extends Fragment implements OnClickListener {
 	}
 
 	/**
-	 * Called by the system when the we are visible. Finds the Kodi config directory, and updates the main text.
+	 * Called by the system when we are visible. Finds the Kodi config directory, and updates the main text.
 	 * @param savedInstanceState
 	 */
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
 		Montext = (TextView) getActivity().findViewById(R.id.status);
 		MonBt = (Button) getActivity().findViewById(R.id.button1);
@@ -129,6 +128,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 			InputStream is;
 			long length = 0;
 			try {
+				//Built-in playercorefactory.xml
 				is = assetManager.open("playercorefactory", AssetManager.ACCESS_BUFFER);
 				length=is.available();
 			} catch (IOException e1) {
@@ -141,6 +141,7 @@ public class MainFragment extends Fragment implements OnClickListener {
 				String fileName=Environment.getExternalStorageDirectory().getPath()
 						+ XBMC_DIRS[XBMC_DIR]+"/userdata/playercorefactory.xml";
 				File f = new File(fileName);
+				//If exists, make a backup
 				if (f.exists()) {
 					File fOld = new File(fileName+".old."+System.currentTimeMillis()/1000);
 					f.renameTo(fOld);
@@ -331,7 +332,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 	@Override
 	public void onPause() {
-		// TODO Auto-generated method stub
 		((MainGUI)getActivity()).save();
 		super.onPause();
 	}
