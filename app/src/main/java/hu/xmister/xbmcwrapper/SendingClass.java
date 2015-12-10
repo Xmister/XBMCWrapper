@@ -269,7 +269,6 @@ public class SendingClass extends Thread {
      * @param pre the parsed headers sent by the client
      * @return error message or null.
      */
-    @SuppressLint("DefaultLocale")
     private void decodeHeader(Socket socket, BufferedReader in, Properties pre) throws MyException, IOException {
         // Read the request line
         String inLine = in.readLine();

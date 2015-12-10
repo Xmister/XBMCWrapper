@@ -100,7 +100,6 @@ public class PvrFragment extends Fragment {
 
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
 		SharedPreferences sharedPreferences = getActivity()
 				.getSharedPreferences("default", 0);
@@ -194,7 +193,6 @@ public class PvrFragment extends Fragment {
 
 	@Override
 	public void onPause() {
-		// TODO Auto-generated method stub
 		((MainGUI)getActivity()).save();
 		super.onPause();
 	}

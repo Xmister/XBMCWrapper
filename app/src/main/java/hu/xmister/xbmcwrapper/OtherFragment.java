@@ -89,7 +89,6 @@ public class OtherFragment extends Fragment {
 
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
 		FilePlayBT = (Button) getActivity().findViewById(R.id.bt_fileplayer);
 		FilePlayBT.setOnClickListener(new View.OnClickListener() {
@@ -165,13 +164,11 @@ public class OtherFragment extends Fragment {
 			
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
 				
 			}
 			
