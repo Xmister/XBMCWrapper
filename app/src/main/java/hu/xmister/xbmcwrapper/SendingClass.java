@@ -165,7 +165,7 @@ public class SendingClass extends Thread {
             if (minus.length>1)
                 endAt = Long.parseLong(minus[1]);
 
-            if( startFrom >= fileSize )
+            if( startFrom >= fileSize || endAt >= fileSize )
                 throw new MyException(HTTP_416,"Content out of range");
 
             if(endAt < 0)

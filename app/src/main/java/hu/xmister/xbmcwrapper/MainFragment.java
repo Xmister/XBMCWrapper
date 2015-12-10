@@ -66,7 +66,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 	 */
 	@Override
 	public void onViewStateRestored(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewStateRestored(savedInstanceState);
 		Montext = (TextView) getActivity().findViewById(R.id.status);
 		MonBt = (Button) getActivity().findViewById(R.id.button1);
@@ -333,7 +332,6 @@ public class MainFragment extends Fragment implements OnClickListener {
 
 	@Override
 	public void onPause() {
-		// TODO Auto-generated method stub
 		((MainGUI)getActivity()).save();
 		super.onPause();
 	}
