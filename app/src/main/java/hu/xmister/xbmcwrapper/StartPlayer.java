@@ -511,10 +511,10 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 
 	/**
 	 * Plays the given Samba file through a MiniDLNA server
-	 * @param FileSmb the file to play
+	 * @param fileSmb the file to play
 	 * @throws Exception usually I/O or connection exception can happen
 	 */
-	private void miniDLNAPlay(final String FileSmb) throws Exception {
+	private void miniDLNAPlay(final String fileSmb) throws Exception {
 		setStatus("Trying miniDLNA...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		String dburl=sharedPreferences.getString("mddb", "smb://10.0.1.4/2TB/minidlna/files.db");
@@ -539,7 +539,7 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 		localdbo.close();
 		dbfile.close();
 		SQLiteDatabase db = SQLiteDatabase.openDatabase(getExternalFilesDir(null).getPath()+File.separator+"files.db", null, SQLiteDatabase.CONFLICT_NONE);
-		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbpath=fileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		for (int x=0; x<sharedPreferences.getInt("mdcut", 2); x++) {
 			smbfile=smbfile.substring(smbfile.indexOf('/')+1);
@@ -584,14 +584,14 @@ public class StartPlayer extends android.support.v4.app.FragmentActivity {
 	 * Mounts the samba share using cifs, and calls the player to play from there.
 	 * Needs root and busybox.
 	 * Can use default commands or custom ones by the user.
-	 * @param FileSmb
+	 * @param fileSmb
 	 * @throws Exception
 	 */
-	private void cifsMountPlay(final String FileSmb) throws Exception {
+	private void cifsMountPlay(final String fileSmb) throws Exception {
 		setStatus("Trying CIFS Mount...",0);
 		SharedPreferences sharedPreferences = getSharedPreferences("default", 0);
 		MOUNT_PATH=sharedPreferences.getString("cifs","/mnt/xbmcwrapper");
-		String smbpath=FileSmb.replaceFirst("(?i)smb:", "");
+		String smbpath=fileSmb.replaceFirst("(?i)smb:", "");
 		String smbfile=smbpath.substring(2);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
 		smbfile=smbfile.substring(smbfile.indexOf('/')+1);
