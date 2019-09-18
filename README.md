@@ -1,5 +1,7 @@
 XBMCWrapper
 ===========
+## This repository contains a really outdated, work in progress version, which basically has nothing in common with the current version. I discontinued updating this public repository as people and even companies stole the code without taking credit.
+
 Based on: http://forum.xbmc.org/showthread.php?tid=155526
 Thread: http://forum.xbmc.org/showthread.php?tid=192651
 
